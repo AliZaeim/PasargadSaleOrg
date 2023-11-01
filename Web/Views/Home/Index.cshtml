@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "بیمه پاسارگاد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    <meta name="author" content="Ali Asle Zaeim">
+    @section MetaTagDescription{
+        <meta content="پرتال سازمان فروش شرکت بیمه پاسارگاد، جهت بررسی وضعیت فروش بیمه نامه های شخصی و سازمانی، برای اعضای سازمان فروش بیمه پاسارگاد می باشد" name="descriptison">
+    }
+}
+
+@section HeaderLight{
+    @(await Component.InvokeAsync("HeaderLight"))
+}
+@section Slider{
+    @(await Component.InvokeAsync("Slider"))
+}
+@section Services{
+    @(await Component.InvokeAsync("Services"))
+}
+@section SelectedNews{
+    @(await Component.InvokeAsync("SelectedNews"))
+}
+@section Features{
+    @(await Component.InvokeAsync("Features"))
+}
+@section Footer{
+    @(await Component.InvokeAsync("Footer"))
+}

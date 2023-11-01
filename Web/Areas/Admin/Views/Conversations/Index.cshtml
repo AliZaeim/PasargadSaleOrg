@@ -1,0 +1,210 @@
+﻿@model IEnumerable<DataLayer.Entities.ComplementaryInfo.Conversation>
+
+@{
+    ViewData["Title"] = "پیام های من";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@if (User.Identity.Name == "290070")
+{
+    <h2 class="text-xs-center alert alert-info">تمام پیامها</h2>
+}
+else
+{
+    <h2 class="text-xs-center alert alert-info">پیامهای من</h2>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">پیام جدید</a>
+</p>
+<table class="table table-bordered table-numberedRows">
+    <thead>
+        <tr>
+            @if (User.Identity.Name == "290070")
+            {
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.SenderCode)
+                </th>
+            }
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.Subject)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.SenderFullPro)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </th>
+            @if (User.Identity.Name != "290070")
+            {
+                <th class="text-xs-center align-middle p-0">
+                    وضعیت
+                </th>
+            }
+            else
+            {
+                <th class="text-xs-center align-middle p-0">
+                    خوانندگان پیام
+                </th>
+            }
+            @if (User.Identity.Name == "290070")
+            {
+                <th class="text-xs-center align-middle p-0">
+                    دریافت کنندگان
+                </th>
+            }
+
+
+
+
+
+            <th class="text-xs-center align-middle p-0">عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Where(w => w.ParentId == null).OrderByDescending(r => r.CreateDate).ToList())
+        {
+            List<string> readers = item.ReadersList.ToList();
+            List<string> receps = item.RecepiesList.ToList();
+            readers = readers.Where(w => !string.IsNullOrEmpty(w)).ToList();
+            receps = receps.Where(w => !string.IsNullOrEmpty(w)).ToList();  
+            <tr>
+                @if (User.Identity.Name == "290070")
+                {
+                    <td class="text-xs-center align-middle p-0">
+                        @Html.DisplayFor(modelItem => item.SenderCode)
+                    </td>
+                }
+                <td class="text-xs-center align-middle p-0">
+                    @Html.DisplayFor(modelItem => item.Subject)
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @Html.DisplayFor(modelItem => item.SenderFullPro)
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @Html.DisplayFor(modelItem => item.CreateDate)
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @if (User.Identity.Name == "290070")
+                    {
+                        @if (!string.IsNullOrEmpty(item.Readers))
+                        {
+                            int RCount = readers.Where(w => w.Substring(0, w.IndexOf("-")) != User.Identity.Name).Count();
+                            @if (receps.Count() != 1)
+                            {
+                                <span class="tag tag-success tag-pill  cursor-pointer" data-id="@item.Id">
+                                    <a href="/Admin/Conversations/ShowReaders?id=@item.Id">
+                                        @RCount
+                                    </a>
+                                </span><span> نفر</span>
+                            }
+                            else
+                            {
+                                <span class="tag tag-success p-r-1 p-l-1">
+                                    @readers.FirstOrDefault()
+                                </span>
+                            }
+
+
+                        }
+                        else
+                        {
+                            <span class="tag tag-danger tag-pill">0</span>
+                        }
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrEmpty(item.Readers))
+                        {
+
+                            if (readers != null)
+                            {
+                                if (readers.Count() != 0)
+                                {
+                                    @if (readers.Any(a => a.Substring(0, a.IndexOf("-")) == User.Identity.Name))
+                                    {
+                                        <span class="text-success fs-11">خوانده شده</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger fs-11">خوانده نشده</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-danger fs-11">خوانده نشده</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-danger fs-11">خوانده نشده</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-danger fs-11">خوانده نشده</span>
+                        }
+                    }
+
+                </td>
+                @if (User.Identity.Name == "290070")
+                {
+                    <td class="text-xs-center align-middle p-0">
+                        @if (!string.IsNullOrEmpty(item.RecepiesInfo))
+                        {
+                            @if (receps.Count() != 1)
+                            {
+                                <a href="/Admin/Conversations/ShowReceps?id=@item.Id">
+                                    <span class="tag tag-info tag-pill cursor-pointer" data-id="@item.Id">
+
+                                        @receps.Count()
+
+                                    </span>
+                                </a><span> نفر</span>
+                            }
+                            else
+                            {
+                                <span class="tag tag-info p-r-1 p-l-1">
+                                    @receps.FirstOrDefault()
+                                </span>
+                            }
+
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                }
+
+
+                <td class="text-xs-center align-middle p-0">
+                    @if (item.SenderCode == User.Identity.Name)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">ویرایش</a> <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.Id">حذف</a> <span> | </span>
+                    }
+
+                    <a asp-action="ShowConv" asp-route-Id="@item.Id">جزئیات</a>
+
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            $(".ShowReaders").click(function () {
+                alert("reders");
+            });
+            $(".ShowReceps").click(function () {
+                alert("receps");
+            });
+        });
+    </script>
+}

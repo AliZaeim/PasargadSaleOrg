@@ -1,0 +1,51 @@
+﻿@model DataLayer.Entities.User.RoleEqulity
+
+@{
+    ViewData["Title"] = "ثبت پاداش همسطحی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">
+    ثبت پاداش همسطحی
+    <a asp-action="Index" class="btn btn-warning float-xs-left"><i class="fa fa-reply"></i></a>
+</h2>
+
+<hr />
+<div class="row">
+    <div class="offset-md-4  col-md-4 col-xs-12">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="RoleId" class="control-label"></label>
+                <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="L1EPercent" class="control-label"></label>
+                <input asp-for="L1EPercent" class="form-control" />
+                <span asp-validation-for="L1EPercent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="L2EPercent" class="control-label"></label>
+                <input asp-for="L2EPercent" class="form-control" />
+                <span asp-validation-for="L2EPercent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="L3EPercent" class="control-label"></label>
+                <input asp-for="L3EPercent" class="form-control" />
+                <span asp-validation-for="L3EPercent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="L4EPercent" class="control-label"></label>
+                <input asp-for="L4EPercent" class="form-control" />
+                <span asp-validation-for="L4EPercent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ثــبت" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+

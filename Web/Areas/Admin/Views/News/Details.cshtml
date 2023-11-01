@@ -1,0 +1,93 @@
+﻿@model DataLayer.Entities.Blogs.News
+@using Core.Convertors;
+@{
+    ViewData["Title"] = "جزئیات خبر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+<h1 class="text-xs-center alert alert-info">
+    جزئیات خبر @Model.News_Title
+    <a asp-action="Index" class="float-xs-left btn btn-warning">بازگشت</a>
+</h1>
+<div>
+
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NewsGroup)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NewsGroup.NewsGroup_Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.News_Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Code)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.News_Code)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Date)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.News_Date.ToShamsiWithTime()
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Abstract)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.News_Abstract)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Text)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.Raw(Model.News_Text)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Image)
+        </dt>
+        <dd class="col-sm-10">
+            <img src="~/images/blogs/@Model.News_Image" width="100" height="100" />
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Publisher_Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Publisher.Publisher_Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Tags)
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var item in Model.TagsList)
+            {
+                if (item != Model.TagsList.Last())
+                {
+                    <span>@item-</span>
+                }
+                else
+                {
+                    <span>@item</span>
+                }
+
+            }
+        </dd>
+
+    </dl>
+    <div class="mt-3">
+
+        <a asp-action="Edit" asp-route-id="@Model.News_Id">ویرایش</a> |
+        <a asp-action="Index">بازگشت</a>
+    </div>
+    
+</div>
+
+

@@ -1,0 +1,303 @@
+﻿@using DataLayer.Entities.User;
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@{
+    //int roleId = int.Parse(User.FindFirst("RoleId").Value);
+    //var role = await _userService.GetRoleByIdAsync(roleId);
+    //var permi = await _userService.GetPermissions_of_RoleByRoleId(roleId);
+    //List<int> TakRange = new List<int> {16,17,18,19,20,21,22,23,24,25 };
+    var user = await _userService.GetUserByUserName(User.Identity.Name);
+    List<Role> roles = await _userService.GetAllRolesofUserWithNameAsync(User.Identity.Name);
+
+}
+<style>
+    /*#main-menu-navigation li{
+        border:1px solid #808080;
+    }*/
+</style>
+<div data-scroll-to-active="true" class="main-menu menu-fixed menu-dark menu-accordion menu-shadow">
+
+    <!-- main menu content-->
+    <div class="main-menu-content">
+        <ul id="main-menu-navigation" data-menu="menu-navigation" class="navigation navigation-main">
+            @if (_userService.CheckPermissionByNameAsync(1, User.Identity.Name))
+            {
+                <li class="nav-item">
+                    <a href="index.html"><i class="icon-home3 green"></i><span class="menu-title">مدیریت</span></a>
+                    <ul class="menu-content">
+                        @if (_userService.CheckPermissionByNameAsync(11, User.Identity.Name))
+                        {
+                            <li class="nav-item is-shown">
+                                <a href="#"><i class="icon-upload info red"></i><span class="menu-title">آپلود سنتر</span></a>
+                                <ul class="menu-content">
+                                    @if (_userService.CheckPermissionByNameAsync(51, User.Identity.Name))
+                                    {
+                                        <li class="nav-item is-shown">
+                                            <a href="/Admin/Upload/Create"><i class="icon-upload22 pink"></i><span class="menu-title"> اطلاعات بوردرو</span></a>
+                                        </li>
+                                        <li class="nav-item is-shown">
+                                            <a href="/Admin/Upload/CreateOther"><i class="icon-upload3 orange"></i><span class="menu-title"> سایر اطلاعات</span></a>
+                                        </li>
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(52, User.Identity.Name))
+                                    {
+                                        <li class="nav-item is-shown">
+                                            <a href="~/Admin/Upload/Index"><i class="icon-list2 green"></i><span class="menu-title">گزارش آپلود</span></a>
+                                        </li>
+
+                                    }
+
+
+                                </ul>
+
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(12, User.Identity.Name))
+                        {
+                            <li class="nav-item is-shown">
+                                <a href="#"><i class="icon-user info"></i><span class="menu-title">کاربران</span></a>
+                                <ul class="menu-content">
+                                    @if (_userService.CheckPermissionByNameAsync(53, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/AdminUsers/UsersWithRole" data-url="/Admin/AdminUsers/UsersWithRole" class="showspinner"><i class="icon-users2 info"></i><span class="menu-title">لیست همکاران</span></a>
+                                        </li>
+
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(53, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/AdminUsers/UsersWithoutRole" data-url="/Admin/AdminUsers/UsersWithRole" class="showspinner"><i class="icon-user-secret red"></i><span class="menu-title">کاربران تایید نشده</span></a>
+                                        </li>
+
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(13, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/Roles/Index"><i class="icon-renren orange"></i><span class="menu-title">نقشها و مجوزها دسترسی</span></a>
+                                        </li>
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(14, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/AdminUsers/NonOrgUsersIndex"><i class="icon-user-plus"></i><span class="menu-title"> کاربران سیستم</span></a>
+                                        </li>
+                                    }
+
+                                </ul>
+
+                            </li>
+                        }
+
+                        @if (_userService.CheckPermissionByNameAsync(15, User.Identity.Name))
+                        {
+                            <li class=" nav-item is-shown">
+                                <a href="#"><i class="icon-book2 warning"></i><span class="menu-title">پلن سازمان فروش</span></a>
+                                <ul class="menu-content">
+                                    @if (_userService.CheckPermissionByNameAsync(64, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/RoleCommissions/Index" class="menu-item showspinner">کارمزدهای سطوح</a>
+                                        </li>
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(69, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/RoleEqulities/Index" class="menu-item showspinner">پاداشهای همانندسازی</a>
+                                        </li>
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(74, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/RolePools/Index" class="menu-item showspinner">پاداشهای بهره وری</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (_userService.CheckPermissionByNameAsync(16, User.Identity.Name))
+                        {
+                            <li class=" nav-item is-shown">
+                                <a href="#"><i class="icon-news green"></i><span class="menu-title">اخبار</span></a>
+                                <ul class="menu-content">
+                                    @if (_userService.CheckPermissionByNameAsync(79, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/NewsGroups/Index" class="menu-item showspinner">گروه های خبر</a>
+                                        </li>
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(83, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/Publishers/Index" class="menu-item showspinner">ناشران خبر</a>
+                                        </li>
+                                    }
+                                    @if (_userService.CheckPermissionByNameAsync(87, User.Identity.Name))
+                                    {
+                                        <li class="is-shown">
+                                            <a href="~/Admin/News/Index" class="menu-item showspinner">اخبار</a>
+                                        </li>
+                                    }
+
+                                </ul>
+                            </li>
+                        }
+
+                        @if (_userService.CheckPermissionByNameAsync(17, User.Identity.Name))
+                        {
+                            <li class="nav-item is-shown">
+                                <a href="/Admin/Sliders/Index"><i class="icon-book3 yellow"></i><span class="menu-title">اسلایدر</span></a>
+
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(18, User.Identity.Name))
+                        {
+                            <li class="nav-item is-shown">
+                                <a href="/Admin/UserMessages/Index"><i class="icon-alarm danger"></i><span class="menu-title">پیامهای کاربران</span></a>
+
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(30, User.Identity.Name))
+                        {
+                            <li class="nav-item is-shown">
+                                <a href="~/Admin/BordroReports/TxtFilesList"><i class="icon-list3 primary"></i><span class="menu-title">فایلهای کارمزد</span></a>
+                            </li>
+                        }
+                        <li class="nav-item is-shown">
+                            <a href="~/Admin/Branches/Index"><i class="icon-certificate orange"></i><span class="menu-title">شعب پاسارگاد</span></a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @if (_userService.CheckPermissionByNameAsync(2, User.Identity.Name))
+            {
+                <li class="nav-item is-shown">
+                    <a href="~/Admin/AdminUsers/OrgUsers" class="showspinner"><i class="icon-users2 yellow"></i><span class="menu-title">نمودار سازمانی</span></a>
+                </li>
+                <li class="nav-item is-shown">
+                    <a href="~/Admin/AdminUsers/CoworkersInfo" class="showspinner"><i class="icon-info orange"></i><span class="menu-title">اطلاعات همکاران </span></a>
+                </li>
+                @*<li class="nav-item is-shown">
+                <a href="~/Admin/ShowChilderens" class="showspinner"><i class="icon-area-chart orange"></i><span class="menu-title">چارت سازمان فروش</span></a>
+            </li>*@
+
+            }
+            @*<li class=" nav-item is-shown">
+            <a href="#"><i class="icon-bar-chart-o" ></i><span class="menu-title">نمودارهای تحلیلی</span></a>
+            <ul class="menu-content">
+                <li class="is-shown">
+                    <a asp-area="Admin" asp-controller="AnalyticalCharts" asp-action="Index" class="menu-item showspinner">نمودار</a>
+                </li>
+                <li class="is-shown">
+                    <a asp-area="Admin" asp-controller="AnalyticalCharts" asp-action="BarChart" class="menu-item showspinner">میله ای</a>
+                </li>
+                <li class="is-shown">
+                    <a asp-area="Admin" asp-controller="AnalyticalCharts" asp-action="LineChart" class="menu-item showspinner">خطی</a>
+                </li>
+                <li class="is-shown">
+                    <a asp-area="Admin" asp-controller="AnalyticalCharts" asp-action="PieChart" class="menu-item showspinner">دایره ای</a>
+                </li>
+                <li class="is-shown">
+                    <a asp-area="Admin" asp-controller="AnalyticalCharts" asp-action="PolarChart" class="menu-item showspinner">قطبی</a>
+                </li>
+                <li class="is-shown">
+                    <a asp-area="Admin" asp-controller="AnalyticalCharts" asp-action="LineScatterChart" class="menu-item showspinner">پراکندگی خطی</a>
+                </li>
+                <li class="is-shown">
+                    <a asp-area="Admin" asp-controller="AnalyticalCharts" asp-action="RadarChart" class="menu-item showspinner">نمودار رادار</a>
+                </li>
+            </ul>
+        </li>*@
+            @if (_userService.CheckPermissionByNameAsync(3, User.Identity.Name))
+            {
+                <li class=" nav-item is-shown">
+                    <a href="#"><i class="icon-file green"></i><span class="menu-title">گزارش بوردرو</span></a>
+                    <ul class="menu-content">
+                        @if (_userService.CheckPermissionByNameAsync(19, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/LifeInsurances" class="menu-item showspinner"><i class="icon-inbox orange"></i> بیمه نامه های شخصی</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(20, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/OrgLifeInsurances" class="menu-item showspinner"><i class="icon-intersex blue"></i> بیمه نامه های سازمانی</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(21, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/LifeInsurances" class="menu-item showspinner"><i class="icon-wallet orange"></i> تمام بیمه نامه ها</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(22, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/LifeAdditions" class="menu-item showspinner ">الحاقیه ها<i class="icon-box-add danger"></i> </a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(23, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/Insureds" class="menu-item showspinner"><i class="icon-person white"></i> بیمه شدگان</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(24, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/NonPaymentBordroes" class="menu-item showspinner"><i class="icon-empire red"></i> عدم وصول</a>
+                            </li>
+                        }
+
+
+                    </ul>
+                </li>
+            }
+
+            @if (_userService.CheckPermissionByNameAsync(4, User.Identity.Name))
+            {
+                <li class=" nav-item is-shown">
+                    <a href="#"><i class="icon-list3 yellow"></i><span class="menu-title">گزارش کارمزد</span></a>
+                    <ul class="menu-content">
+                        @if (_userService.CheckPermissionByNameAsync(25, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/PCommissionsPage" class="menu-item showspinner"><i class="icon-moneybag fs-18 cyan"></i> کارمزد شخصی</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(26, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/SOrgCommissionsPage" class="menu-item showspinner"><i class="icon-bag3 fs-18 purple"></i> کارمزد سازمانی</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(27, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/SOrgCommissionsPage" class="menu-item showspinner"><i class="icon-money fs-18 info"></i> کارمزد</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(28, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/CommissionsList" class="menu-item showspinner"><i class="icon-list-numbered fs-18 info"></i> لیست کارمزد</a>
+                            </li>
+                        }
+                        @if (_userService.CheckPermissionByNameAsync(29, User.Identity.Name))
+                        {
+                            <li class="is-shown">
+                                <a href="~/Admin/BordroReports/PoolRewardReport" class="menu-item showspinner"><i class="icon-money1 fs-18 orange"></i> پاداش بهره وری</a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+
+
+
+        </ul>
+    </div>
+
+</div>

@@ -1,0 +1,520 @@
+﻿@model Core.DTOs.Admin.ReportUserRolesViewModel;
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IUserService userService
+@inject IPermissionService permissionService
+@{
+    ViewData["Title"] = "لیست کامل کاربران دارای نقش";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    DataLayer.Entities.User.User user = await userService.GetUserByUserName(User.Identity.Name);
+}
+
+<div>
+    <div>
+        <div class="col-md-1 col-xs-12"></div>
+        <div class="col-md-10 col-xs-12">
+            @if (User != null)
+            {
+                <h2 class="text-xs-center alert col-xs-12 alert-info">لیست کامل کاربران دارای نقش  @user.FullName</h2>
+            }
+            else
+            {
+                <h2 class="text-xs-center alert col-xs-12 alert-info">لیست کامل کاربران دارای نقش</h2>
+
+            }
+        </div>
+        <div class="col-md-1 col-xs-12">
+            <form action="WriteUsersExcelFile" method="post">
+                <button type="submit" title="گزارش اکسل" class="btn btn-outline-primary float-xs-left mb-1"><span class="fa fa-file-excel-o orange"></span></button>
+            </form>
+        </div>
+    </div>
+    <div class="form-group  col-xs-12 pr-0 pl-0 ">
+        <form action="UsersWithRole" method="post" class="form-inline">
+
+            <div class="col-md-5 col-xs-12 mb-1 form-group">
+                <select class="col-xs-5" asp-for="SearchField" name="searchField" data-toggle="tooltip" data-placement="top" title="موضوع جستجو">
+                    <option value="" disabled>جستجو بر اساس</option>
+                    <option value="all">تمام ستونها</option>
+                    <option value="fullname">نام کامل</option>
+                    <option value="role">نقش</option>
+                    <option value="code">کد کاربری</option>
+                    <option value="state">استان</option>
+                    <option value="county">شهرستان</option>
+                    <option value="parent">ناظر</option>
+                    <option value="rdate">تاریخ ثبت</option>
+
+
+                </select>
+                <input class="col-xs-7 input-lg text-xs-center" name="search" type="text" autofocus autocomplete="off" value="@Model.SearchText" placeholder="جستجو...">
+
+            </div>
+            <div class="col-md-5 col-xs-12 mb-1 form-group">
+                <input type="number" name="RecCount" class="col-md-5 col-xs-6 text-xs-center" placeholder="تعداد" data-toggle="tooltip" data-placement="top" title="تعداد در صفحه" value="@Model.RecCount" />
+                <input type="number" maxlength="5" name="page" class="offset-md-2 col-md-5 col-xs-6  text-xs-center" placeholder="برو به ؟" data-toggle="tooltip" data-placement="top" title="انتقال به صفحه" />
+            </div>
+            <div class="col-md-2 col-xs-12 form-group">
+                <input type="submit" value="تایید" class="col-xs-12" />
+            </div>
+        </form>
+    </div>
+    <div class="col-xs-12 pt-1 mb-2 border-grey">
+        <div class="col-md-2 col-xs-6 mb-1">کل داده ها : <span class="tag tag-info ">@Model.AllUserRoles.Count()</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">کل صفحات : <span class="tag tag-success">@Model.TotalPages</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">صفحه فعلی : <span class="tag tag-info">@Model.CurPage</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">تعداد در صفحه : <span class="tag tag-success">@Model.RecCount</span></div>
+        <div class="col-md-4 col-xs-12">
+            جستجو براساس :
+            @if (!string.IsNullOrEmpty(Model.SearchText) && !string.IsNullOrEmpty(Model.SearchField))
+            {
+                <span class="tag tag-warning ">@Model.SearchField &lArr; @Model.SearchText</span>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="table-responsive">
+   
+    <table class="table table-bordered sortable table-numberedRows" id="tblUsers">
+        <thead>
+            <tr class="cursor-pointer fs-12">
+
+                <th class="text-xs-center align-middle">
+                    نام کامل
+                </th>
+                <th class="text-xs-center align-middle">
+                    نقش
+                </th>
+                <th class="text-xs-center align-middle p-0">کد کاربری</th>
+                <th class="text-xs-center align-middle">رمز</th>
+                <th class="text-xs-center p-0 width-20-per align-middle">
+                    <span>لیست ناظرها</span> &lArr;
+                    <span class="text-success">فعال</span> |
+                    <span class="grey">غیرفعال</span>
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    تاریخ ثبت
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    استان
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    شهرستان
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    کاربری
+                    @if (permissionService.CheckPermission(99, User.Identity.Name))
+                    {
+                        <span class="fa fa-info-circle blue float-left" data-toggle="tooltip" data-placement="top" title="برای ویرایش وضعیت روی آن کلیک کنید"></span>
+                    }
+
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    نقش
+                </th>
+
+
+                <th class="text-xs-center align-middle">
+                    عملیات
+                </th>
+
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @{int radif = 1;}
+            @*//order by descending base on code in service*@
+            @foreach (var item in Model.PageUserRoles.GroupBy(g => new { g.User_ID, g.RoleId }).Select(s => s.Last()).ToList())
+            {
+                <tr class="text-xs-center align-middle border">
+
+                    <td class="align-middle fs-14 p-0">
+                        @item.User.FullName
+                    </td>
+                    <td class="align-middle fs-14 p-0">
+                        @item.Role.RoleTitle
+                    </td>
+                    <td class="align-middle p-0">
+                        @item.User.Code
+                    </td>
+                    <td class="align-middle fs-14 p-0">
+                        @if (item.RoleId != 1)
+                        {
+
+                            <div class="form-group">
+
+                                <input id="@radif" type="password" class="col-xs-9 no-border  password-field" readonly name="password" value="@item.User.Password">
+                                <span toggle="#@radif" class="col-xs-3 cursor-pointer fa fa-fw fa-eye field-icon toggle-password"></span>
+
+                            </div>
+
+                        }
+                        else
+                        {
+                            <span>***</span>
+                        }
+
+                    </td>
+
+                    <td class="align-middle valign-middle p-0 ">
+                        @if (item.UserRoleParent != null)
+                        {
+                            @foreach (var p in Model.PageUserRoles.Where(w => w.User_ID == item.User_ID && w.RoleId == item.RoleId).OrderByDescending(r => r.IsActive).ToList())
+                            {
+
+                                var userrole = await userService.GetUserRoleByIdAsync((int)p.UserRoleParentId);
+                                string ParentPro = "بدون ناظر";
+                                if (userrole.UserRoleParent != null)
+                                {
+                                    ParentPro = userrole.UserRoleParent.FullPro;
+                                }
+                                if (p.IsActive == true)
+                                {
+                                    <span class="text-success fs-11 Bold m-b-2 col-xs-12">
+                                        @userrole.FullPro
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="grey fs-11 m-b-2 col-xs-12">
+                                        @userrole.FullPro
+                                    </span>
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </td>
+                    <td class="align-middle fs-12 p-0">
+                        @item.RegisterDate.ToShamsiWithTime()
+                    </td>
+                    <td class="align-middle fs-12 p-0">
+                        @item.User.County.State.StateName
+                    </td>
+                    <td class="align-middle fs-12 p-0">
+                        @item.User.County.CountyName
+                    </td>
+
+                    <td class="align-middle p-0">
+                        @if (permissionService.CheckPermission(99, User.Identity.Name))
+                        {
+                            @if (item.User.IsActive == true)
+                            {
+                                <span class="chkUserActive @item.User.Code  cursor-pointer green" data-fullname="@item.User.FullName" data-change-state="false" data-code="@item.User.Code" data-toggle="tooltip" data-placement="top" title="فعال">
+                                    فعال
+                                </span>
+
+                            }
+                            else
+                            {
+                                <span class="chkUserActive @item.User.Code  cursor-pointer red" data-fullname="@item.User.FullName" data-change-state="true" data-code="@item.User.Code" data-toggle="tooltip" data-placement="top" title="غیر فعال">
+                                    غیرفعال
+                                </span>
+
+                            }
+                        }
+                        else
+                        {
+                            @if (item.User.IsActive == true)
+                            {
+                                <span class=" @item.User.Code green" data-fullname="@item.User.FullName" data-change-state="false" data-code="@item.User.Code" data-toggle="tooltip" data-placement="top" title="فعال">
+                                    فعال
+                                </span>
+
+                            }
+                            else
+                            {
+                                <span class=" @item.User.Code red" data-fullname="@item.User.FullName" data-change-state="true" data-code="@item.User.Code" data-toggle="tooltip" data-placement="top" title="غیر فعال">
+                                    غیرفعال
+                                </span>
+
+                            }
+                        }
+
+                    </td>
+                    <td class="align-middle p-0">
+
+                        @if (Model.PageUserRoles.Where(w => w.User_ID == item.User_ID && w.RoleId == item.RoleId).OrderByDescending(r => r.IsActive).FirstOrDefault().IsActive == true)
+                        {
+                            @*<span class="chkURActive fa fa-check cursor-pointer green" data-code="@item.OrgCode" data-state="false" id="urActive" data-toggle="tooltip" data-placement="top" title="فعال"></span>*@
+                            <span class="text-success">فعال</span>
+
+                        }
+                        else
+                        {
+                            @*<span class="chkURActive fa fa-check-square cursor-pointer red" data-code="@item.OrgCode" data-state="true" id="urActive" data-toggle="tooltip" data-placement="top" title="غیر فعال"></span>*@
+                            <span class="text-danger">غیرفعال</span>
+                        }
+
+
+                    </td>
+
+                    <td class="text-xs-right align-middle p-0">
+                        @if (permissionService.CheckPermission(55, User.Identity.Name))
+                        {
+                            <span>&ensp;</span>
+                            <a href="/Admin/AdminUsers/UserRolesDetails/@item.URId" target="_blank" data-toggle="tooltip" data-placement="top" title="جزئیات">
+                                <i class="fa fa-list-alt fa-x info"></i>
+                            </a>
+                        }
+
+                        @if (item.IsActive == true && item.User.IsActive == true)
+                        {
+                            @if (permissionService.CheckPermission(54, User.Identity.Name))
+                            {
+                                <span>&ensp;</span>
+                                <a href="/Admin/AdminUsers/EditUser/@item.User_ID" data-toggle="tooltip" data-placement="top" title="ویرایش">
+                                    <i class="fa fa-edit fa-x orange"></i>
+                                </a>
+                            }
+                            @if (permissionService.CheckPermission(56, User.Identity.Name))
+                            {
+                                <span> &ensp;</span>
+                                <a href="javascript:void(0)" class="changeParent" data-toggle="tooltip" data-placement="top" data-urId="@item.URId" title="تغییر ناظر"><i class="fa fa-empire fa-x warning"></i></a><span> &ensp;</span>
+                            }
+                            @if (permissionService.CheckPermission(57, User.Identity.Name))
+                            {
+                                <a href="javascript:void(0)" class="btnChangeRole" data-urId="@item.URId" data-toggle="tooltip" data-placement="top" title="تغییر سمت"><i class="fa fa-key cursor-pointer fa-x red"></i></a>
+                            }
+
+                        }
+
+                        @if (item.Role == null)
+                        {
+                            @if (User.Identity.Name == "290070")
+                            {
+                                <a href="/MainAdmin/DeleteUser?Id=@item.User_ID" target="_blank" data-toggle="tooltip" data-placement="top" title="حــذف کاربر">
+                                    <i class="fa fa-remove red"></i>
+                                </a>
+                            }
+
+                        }
+
+
+                    </td>
+
+                </tr>
+                { radif++; }
+            }
+        </tbody>
+    </table>
+    <input type="hidden" id="stext" value="@Model.SearchText" />
+
+</div>
+
+@section Scripts{
+
+    <script src="~/AdminRef/app-assets/js/sweetalert2.js"></script>
+    <script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/table2excel.js"></script>
+    <script src="~/AdminRef/app-assets/js/sorttable.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".toggle-password").click(function () {
+
+                $(this).toggleClass("fa-eye fa-eye-slash");
+                var input = $($(this).attr("toggle"));
+
+                if (input.attr("type") == "password") {
+                    input.attr("type", "text");
+                } else {
+                    input.attr("type", "password");
+                }
+            });
+
+            $("tbody td").on("mouseover", function () {
+                var row_index = $(this).parent().index();
+                var col_index = $(this).index();
+                $(this).prop("title", row_index + 1);
+            });
+            var srch = $("#stext").val();
+            if (srch !== "") {
+                var term = srch;
+
+                var $context = $("table tbody tr");
+                $context.show().unmark();
+                if (term) {
+                    $context.mark(term, {
+                        "className": "bg-warning",
+                        "separateWordSearch": true,
+                        "accuracy": "complementary",
+                        done: function () {
+                            if (term.includes("-") === false) {
+                                $context.not(":has(mark)").hide();
+                            }
+                            
+                        }
+                    });
+                }
+            }
+
+            $("#btnSearch").click(function () {
+                var term = $("#myInput").val();
+
+                var $context = $("table tbody tr");
+                $context.show().unmark();
+                if (term) {
+                    $context.mark(term, {
+                        "className": "bg-warning",
+                        "separateWordSearch": false,
+                        "accuracy": "exactly",
+                        done: function () {
+                            $context.not(":has(mark)").hide();
+                        }
+                    });
+                }
+            })
+            $(".btnAddRole").click(function () {
+                var uid = $(this).attr("data-userId");
+                //var name = $(this).parent().siblings('.fullname').text();
+
+                var title = "افزودن نقش ";
+                $.ajax({
+                    url: "/Admin/AdminUsers/AddRoleToUser",
+                    data: { userId: uid },
+                    type: "GET",
+                    success: function (result) {
+
+                        $("#AdminModalTitle").text(title);
+                        $("#AdminModalBody").html(result);
+                        $("#AdminModal").modal('show');
+
+                    }
+                });
+            });
+            $(".btnChangeRole").click(function () {
+                var urid = $(this).attr("data-urId");
+                //var name = $(this).parent().siblings('.fullname').text();
+
+                var title = "تغییر سمت";
+                $.ajax({
+                    url: "/Admin/AdminUsers/ChangeRoleofUser",
+                    data: { urId: urid },
+                    type: "GET",
+                    success: function (result) {
+
+                        $("#AdminModalTitle").text(title);
+                        $("#AdminModalBody").html(result);
+                        $("#AdminModal").modal('show');
+
+                    }
+                })
+            });
+
+            $(".changeParent").click(function () {
+                var uid = $(this).attr("data-urId");
+
+                //var name = $(this).parent().siblings('.fullname').text();
+                var title = "تغییر ناظر";
+                $.ajax({
+                    url: "/Admin/AdminUsers/ChangeParent",
+                    data: { urId: uid },
+                    type: "GET",
+                    success: function (result) {
+
+                        $("#AdminModalTitle").text(title);
+                        $("#AdminModalBody").html(result);
+                        $("#AdminModal").modal('show');
+
+                    }
+                })
+            });
+            $(".chkUserActive").click(function () {
+
+                var code = $(this).attr("data-code");
+                var acstate = $(this).attr("data-change-state");
+                var fN = $(this).attr("data-fullname");
+                var pr = "وضعیت مشخص نشده است !";
+
+                if (acstate === "true") {
+                    pr = " آیا مطمئن به فعال کردن کاربری" + " " + fN + " هستید؟";
+
+                }
+                if (acstate === "false") {
+                    pr = " آیا مطمئن به غیرفعال کردن کاربری" + " " + fN + " هستید؟";
+
+                }
+
+                var th = $("." + code);
+                Swal.fire({
+                    title: 'مدیریت وضعیت کاربری',
+                    text: pr,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'بله هستم',
+                    cancelButtonText: "انصراف"
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            url: "/Admin/AdminUsers/ChangeUserState",
+                            data: { userCode: code, state: acstate },
+                            type: "POST",
+                            success: function (result) {
+                                if (result === true) {
+                                    Swal.fire({
+                                        title: 'پایان عملیات',
+                                        text: 'عملیات با موفقیت انجام شد',
+                                        icon: 'success',
+                                        confirmButtonText: 'متشکرم',
+                                        showCloseButton: true
+                                    });
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: 'پایان عملیات',
+                                        text: 'عملیات با موفقیت انجام نشد',
+                                        icon: 'danger',
+                                        confirmButtonText: 'متاسفم',
+                                        showCloseButton: true
+                                    });
+                                }
+
+                                if (acstate === "true") {
+
+
+                                    th.attr("data-change-state", "false");
+                                    th.attr("title", "فعال");
+                                    th.text("فعال");
+                                    th.removeClass("red").addClass("green");
+
+                                }
+                                if (acstate === "false") {
+                                    th.attr("data-change-state", "true");
+                                    th.attr("title", "غیرفعال");
+                                    th.text("غیرفعال");
+                                    th.removeClass("green").addClass("red");
+
+                                }
+                                e.stopPropagation();
+
+                            }
+                        })
+
+                    }
+                })
+            });
+            $("#btnExport").click(function () {
+                var d = new Date();
+                var t = "Y" + d.getFullYear() + "M" + d.getMonth() + "D" + d.getDay() + "H" + d.getHours() + "M" + d.getMinutes() + "S" + d.getSeconds();
+                $("#tblUsers").table2excel({
+                    filename: "Table" + t
+                });
+            });
+
+
+        });
+
+    </script>
+
+}

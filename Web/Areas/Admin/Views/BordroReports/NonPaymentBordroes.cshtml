@@ -1,0 +1,238 @@
+﻿@model Core.DTOs.General.NonPaymentBordroesModel
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@inject IBordroService _bordroService
+@{
+    ViewData["Title"] = "عدم وصول";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    DataLayer.Entities.User.User user = await _userService.GetUserByUserName(User.Identity.Name);
+
+}
+<div>
+    <div class="col-md-3 col-xs-12"></div>
+    <div class="col-md-6 col-xs-12">
+        @if (User != null)
+        {
+            @if (User.Identity.Name != "290070")
+            {
+                <h2 class="text-xs-center alert alert-info">گزارش عدم وصول  @user.FullName</h2>
+            }
+            else
+            {
+                <h2 class="text-xs-center alert alert-info">عدم وصول</h2>
+            }
+        }
+        else
+        {
+            <h2 class="text-xs-center alert alert-info">عدم وصول </h2>
+
+        }
+    </div>
+    <div class="col-md-3 col-xs-12">
+        <form action="WriteNonePayBordroesExcelFile" method="post">
+            <button type="submit" title="ثبت گزارش اکسل" class="btn btn-outline-primary float-xs-left mb-1"><span class="fa fa-file-excel-o orange"></span></button>
+        </form>
+    </div>
+    <div class="form-group  col-xs-12 pr-0 pl-0">
+        <form action="NonPaymentBordroes" method="post" class="form-inline">
+            <div class="col-md-5 col-xs-12 mb-1 form-group">
+                <select class="col-xs-5" asp-for="SearchField" name="searchField" data-toggle="tooltip" data-placement="top" title="موضوع جستجو">
+                    <option value="" disabled>جستجو بر اساس</option>
+                    <option value="all">تمام ستونها</option>
+                    <option value="insno">شماره بیمه نامه</option>
+                    <option value="issuedate">تاریخ صدور</option>
+                    <option value="insurerfullname">نام کامل بیمه گذار</option>
+                    <option value="insuredfullname">نام کامل بیمه شده</option>
+                    <option value="phone">تلفن بیمه شده</option>
+                    <option value="agent">عامل فروش</option>
+                    <option value="paymethod">روش پرداخت</option>
+                    <option value="paymethodvalue">حق بیمه</option>
+                    <option value="state">وضعیت</option>
+                    <option value="type">نوع</option>
+                    <option value="lastrDate">آخرین وصول</option>
+                    <option value="noncount">تعداد معوق</option>
+
+                </select>
+
+                <input class="col-xs-7 input-lg text-xs-center" name="search" type="text" autofocus autocomplete="off" value="@Model.SearchText" placeholder="جستجو...">
+
+            </div>
+            <div class="col-md-5 col-xs-12 mb-1 form-group">
+                <input type="number" name="RecCount" class="col-md-5 col-xs-6 text-xs-center" placeholder="تعداد" data-toggle="tooltip" data-placement="top" title="تعداد در صفحه" value="@Model.RecCount" />
+                <input type="number" maxlength="5" name="page" class="offset-md-2 col-md-5 col-xs-6  text-xs-center" placeholder="برو به ؟" data-toggle="tooltip" data-placement="top" title="انتقال به صفحه" />
+            </div>
+            <div class="col-md-2 col-xs-12 form-group">
+                <input type="submit" value="تایید" class="col-xs-12" />
+            </div>
+        </form>
+    </div>
+    <div class="col-xs-12 form-group pt-1 mb-2 border-grey">
+        <div class="col-md-2 col-xs-6 mb-1">کل داده ها : <span class="tag tag-info ">@Model?.TotalRecCount</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">کل صفحات : <span class="tag tag-success">@Model?.TotalPages</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">صفحه فعلی : <span class="tag tag-info">@Model.CurPage</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">تعداد در صفحه : <span class="tag tag-success">@Model.RecCount</span></div>
+        <div class="col-md-4 col-xs-12">
+            جستجو براساس :
+            @if (!string.IsNullOrEmpty(Model.SearchText))
+            {
+                <span class="tag tag-warning ">
+                    @Model.SearchFieldName : @Model.SearchText
+                </span>
+            }
+
+
+        </div>
+
+    </div>
+</div>
+<div class="table-responsive">
+   
+    @if (Model.NonePaymentBordroesDets != null)
+    {
+
+        <table class="table table-bordered table-striped sortable table-numberedRows fs-13" id="tblBordroes">
+            <thead>
+                <tr class="fs-12">
+
+                    <th class="text-xs-center align-middle width-15-per p-0">
+                        شماره بیمه نامه
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        تاریخ صدور
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        بیمه گذار
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        بیمه شده
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                       تلفن
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        عامل فروش
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        روش
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        حق بیمه
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        سپرده
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        نوع الحاقیه
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        وضعیت
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        حق بیمه وصولی
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        آخرین وصول
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        تعداد معوق
+                    </th>
+                </tr>
+            </thead>
+            @if (Model.NonePaymentBordroesDets != null)
+            {
+                <tbody id="myTable" class="fs-13">
+                    @if (Model.NonePaymentBordroesDets != null)
+                    {
+                        @foreach (var item in Model.NonePaymentBordroesDets.OrderByDescending(r => r.IssueDate).ThenBy(r => r.InsNO))
+                        {
+                    <tr>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.InsNO
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.IssueDate.ToShamsi()
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.Insurer
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.Insured
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.InsuredPhone
+                        </td>
+                        <td class="text-xs-center align-middle p-0 ">
+                            @item.Seller
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.PaymentMethod
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.PaymentMethodValue.ToString("N0")
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.Deposit.ToString("N0")
+                        </td>
+
+                        <td class="text-xs-center align-middle p-0">
+                            @item.Type
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.Status
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.TotalPremiumReceived.ToString("N0")
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.LastReceiveDate.ToShamsi()
+                        </td>
+                        <td class="text-xs-center align-middle p-0">
+                            @item.NonReceivedCount
+                        </td>
+                    </tr>
+                        }
+                    }
+                </tbody>
+            }
+        </table>
+    }
+    else
+    {
+        <h4 class="text-xs-center alert alert-danger">بیمه نامه ای وجود ندارد !</h4>
+    }
+
+    <input type="hidden" id="stext" value="@Model.SearchText" />
+</div>
+@section Scripts{
+
+    <script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/sorttable.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+           
+            $("tbody td").on("mouseover", function () {
+                var row_index = $(this).parent().index();
+                var col_index = $(this).index();
+                $(this).prop("title", row_index + 1);
+            });
+            var srch = $("#stext").val();
+            if (srch !== "") {
+                var term = srch;
+                var $context = $("table tbody tr");
+                $context.show().unmark();
+                if (term) {
+                    $context.mark(term, {
+                        "className": "bg-warning",
+                        "separateWordSearch": true,
+                        "accuracy": "complementary",
+                        done: function () {
+                            $context.not(":has(mark)").hide();
+                        }
+                    });
+                }
+            }
+
+        });
+    </script>
+}

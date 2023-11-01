@@ -1,0 +1,64 @@
+﻿@model IEnumerable<DataLayer.Entities.ComplementaryInfo.UserMessage>
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@{
+    ViewData["Title"] = "پیام های کاربران";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">پیام های کاربران</h2>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Subject)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Message)
+            </th>
+            <th class="text-xs-center align-middle">عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderByDescending(r => r.CreateDate))
+        {
+            <tr>
+                <td class="text-xs-center align-middle">
+                    @item.CreateDate.ToShamsiN_WithTime()
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Subject)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Message)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @if (_userService.CheckPermissionByNameAsync(98, User.Identity.Name))
+                    {
+                        <a asp-action="Edit" asp-route-Id="@item.Id">ویرایش</a>
+                    }
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

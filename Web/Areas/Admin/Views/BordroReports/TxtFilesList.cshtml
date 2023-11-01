@@ -1,0 +1,36 @@
+﻿@model IEnumerable<System.IO.FileInfo>
+@using Core.Convertors;
+@using System.IO;
+@{
+    ViewData["Title"] = "لیست فایلهای کارمزد";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">لیست فایلهای کارمزد</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">نام فایل</th>
+            <th class="text-xs-center align-middle">تاریخ ایجاد</th>
+            <th class="text-xs-center align-middle">عملیات</th>
+        </tr>
+        
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderByDescending(r => r.CreationTime))
+        {
+            <tr>
+                <td class="text-xs-center align-middle">@item.Name</td>
+                <td class="text-xs-center align-middle">@item.CreationTime.ToShamsiWithTime()</td>
+                <td class="text-xs-center align-middle">
+                    @*<a href="~/txtFiles/@item.Name" class="btn btn-success">دانلود</a>*@
+                    
+                    <a asp-action="DownloadFile" asp-route-fileName="@item.Name">دانلود</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

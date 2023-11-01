@@ -1,0 +1,28 @@
+﻿@model Core.DTOs.General.UploadDocumentViewModel
+
+@{
+    ViewData["Title"] = "آپلود کارت ملی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="alert alert-info text-xs-center">آپلود کارت ملی</h2>
+
+
+<hr />
+<div class="row">
+    <div class="offset-md-4 col-md-4 col-xs-12">
+        <form asp-action="UploadNC" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label  class="control-label">تصویر کارت ملی خود را آپلود کنید</label>
+                <input asp-for="NCFileName" type="file" class="form-control" />
+                <span asp-validation-for="NCFileName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="آپلود" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+
+

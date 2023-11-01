@@ -1,0 +1,234 @@
+﻿@model Core.DTOs.General.NewsVM
+
+@using Core.Convertors;
+
+@{
+    ViewData["Title"] = "اخبار پرتال گزارشات سازمان فروش";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @section MetaTagDescription{
+        <meta content="مهمترین اخبار و اطلاعیه های سازمان فروش تخصصی بیمه پاسارگاد" name="descriptison">
+    }
+
+}
+@section HeaderBlack{
+    @(await Component.InvokeAsync("HeaderBlack"))
+}
+<!-- ======= Blog Section ======= -->
+<section class="breadcrumbs">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>اخبار</h2>
+
+            <ol>
+                <li><a href="/">بیمه پاسارگاد</a></li>
+                @if (Model.GId == null)
+                {
+                    <li>اخبار</li>
+                }
+                else
+                {
+                    <li>
+                        <a href="/News">اخبار</a>
+                    </li>
+                    <li>گروه : @Model.NewsGroup.NewsGroup_Title</li>
+                }
+
+
+            </ol>
+        </div>
+
+    </div>
+</section><!-- End Blog Section -->
+<!-- ======= Blog Section ======= -->
+<section class="blog" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="sidebar">
+
+
+                    @if (Model.NewsGroups != null)
+                    {
+                        if (Model.NewsGroups.Count() != 0)
+                        {
+                            <h3 class="sidebar-title text-right">گروه های خبر</h3>
+                            <div class="sidebar-item categories text-right">
+                                <ul>
+                                    @foreach (var item in Model.NewsGroups)
+                                    {
+                                        if (Model.GId != null)
+                                        {
+                                            if (item.NewsGroup_Id == (int)Model.GId)
+                                            {
+                                                <li class="border p-1">
+                                                    <a href="/News?gid=@item.NewsGroup_Id">
+                                                        @item.NewsGroup_Title
+                                                        <span class="float-left tag tag-primary">@item.News.Count()</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li class="p-1">
+                                                    <a href="/News?gid=@item.NewsGroup_Id">
+                                                        @item.NewsGroup_Title
+                                                        <span class="float-left tag tag-primary">@item.News.Count()</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <li class="p-1">
+                                                <a href="/News?gid=@item.NewsGroup_Id">
+                                                    @item.NewsGroup_Title
+                                                    <span class="float-left tag tag-primary">@item.News.Count()</span>
+                                                </a>
+                                            </li>
+                                        }
+
+                                    }
+
+                                </ul>
+
+                            </div><!-- End sidebar categories-->
+                        }
+                    }
+
+                    @if (Model.LastNews != null)
+                    {
+                        if (Model.LastNews.Count() != 0)
+                        {
+                            <h3 class="sidebar-title text-right">آخرین اخبار</h3>
+                            <div class="sidebar-item recent-posts">
+                                @foreach (var nw in Model.LastNews.OrderByDescending(r => r.News_Date))
+                                {
+                                    <div class="post-item clearfix">
+                                        @if (!string.IsNullOrEmpty(nw.News_Image))
+                                        {
+                                            <img src="~/images/blogs/@nw.News_Image" alt="@nw.News_Title">
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/no-img450450.jpg" alt="@nw.News_Title">
+                                        }
+                                        <h4 class="text-right"><a href="/News/d/@nw.News_Code">@nw.News_Title</a></h4>
+                                        <time datetime="@nw.News_Date">@nw.News_Date.ToShamsi()</time>
+                                    </div>
+                                }
+
+                            </div><!-- End sidebar recent posts-->
+                        }
+                    }
+
+                    @if (Model.Tags != null)
+                    {
+                        @if (Model.Tags.Count() != 0)
+                        {
+                            <h3 class="sidebar-title text-right">برچسب ها</h3>
+                            <div class="sidebar-item tags text-right">
+                                <ul>
+                                    @foreach (var item in Model.Tags)
+                                    {
+                                        <li class="border p-1 ml-1 mb-1 rounded zgrey1">@item</li>
+                                    }
+
+
+                                </ul>
+
+                            </div><!-- End sidebar tags-->
+
+                        }
+                    }
+
+
+                </div><!-- End sidebar -->
+
+            </div>
+
+            <div class="col-lg-8 entries">
+                @if (Model.PageNews != null)
+                {
+                    @if (Model.PageNews.Count() != 0)
+                    {
+                        foreach (var item in Model.PageNews.OrderByDescending(r => r.News_Date))
+                        {
+                            <article class="entry">
+                                @if (!string.IsNullOrEmpty(item.News_Image))
+                                {
+                                    <div class="entry-img ">
+                                        <img src="/images/blogs/@item.News_Image" alt="@item.News_Title" class="img-fluid w-100">
+                                    </div>
+                                }
+
+
+                                <h2 class="entry-title text-right">
+                                    <a href="/News/d/@item.News_Code">
+                                        @item.News_Title
+                                    </a>
+                                </h2>
+
+                                <div class="entry-meta">
+                                    <ul>
+                                        <li class="d-flex align-items-center">
+                                            <i class="icofont-user"></i>
+                                            <a href="javascript:void(0)">
+                                                @item.Publisher.Publisher_Title
+                                            </a>
+                                        </li>
+                                        <li class="d-flex align-items-center">
+                                            <i class="icofont-wall-clock"></i>
+                                            <a href="javascript:void(0)">
+                                                <time datetime="@item.News_Date">
+                                                    @item.News_Date.ToShamsiWithTime()
+                                                </time>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+
+                                <div class="entry-content">
+                                    <p class="text-justify fs-18 line-height-1">
+                                        @item.News_Abstract
+                                    </p>
+                                    <div class="read-more">
+                                        <a href="/News/d/@item.News_Code" class="float-left">شرح کامل خبر ...</a>
+                                    </div>
+                                </div>
+
+                            </article>
+                        }
+                    }
+                }
+
+                <div class="blog-pagination">
+                    <ul class="justify-content-center">
+                        @for (int p = 1; p < Model.TotalPage; p++)
+                        {
+                            if (Model.CurrentPage == p)
+                            {
+                                <li class="active"><a href="/News?page=@p">@p</a></li>
+                            }
+                            else
+                            {
+                                <li><a href="/News?page=@p">@p</a></li>
+                            }
+                        }
+
+                    </ul>
+                </div>
+
+            </div><!-- End blog entries list -->
+            <!-- End blog sidebar -->
+
+        </div><!-- End .row -->
+
+    </div><!-- End .container -->
+
+</section><!-- End Blog Section -->
+@section Footer{
+    @(await Component.InvokeAsync("Footer"))
+}

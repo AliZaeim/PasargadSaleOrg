@@ -1,0 +1,202 @@
+﻿@model Core.DTOs.General.UserUpdateProFileVM
+
+@{
+    ViewData["Title"] = "ویرایش پروفایل";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <h4 class="text-xs-center alert alert-success">@Model.Message</h4>
+}
+<h2 class="text-xs-center alert alert-info">ویرایش پروفایل</h2>
+
+
+
+<div class="row">
+    <div class="offset-md-4 col-md-4 col-xs-12">
+        <form asp-action="UpdateProfile" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for="Id" type="hidden" class="form-control" />
+
+            <div class="form-group">
+                @{
+                    string mess = "از جدا کننده . استفاده شود" + "\n\n" + "مثال  3901.8000.14575602.1";
+                }
+                
+                <label asp-for="BankAccountNumber" class="control-label"></label><span class="fa fa-question-circle orange float-xs-left"  title="@mess"></span>
+                <input asp-for="BankAccountNumber" class="form-control" />
+                <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @{
+                    string messBC = "فقط اعداد شماره کارت را وارد کنید" + "\n\n" + "سیستم از جداکننده - در جای لازم استفاده خواهد کرد";
+                }
+                <label asp-for="BankCardNumber" class="control-label"></label><span class="fa fa-question-circle orange float-xs-left" title="@messBC"></span>
+                <input asp-for="BankCardNumber" class="form-control" />
+                <span asp-validation-for="BankCardNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="input-group ">
+                    <label asp-for="StateId" class="control-label"></label>
+                    <select asp-for="StateId" class="form-control " id="state">
+                        <option value="">استان خود را انتخاب کنید...</option>
+                        @foreach (var state in Model.States)
+                        {
+                            if (Model.StateId == state.StateId)
+                            {
+                                <option selected value="@state.StateId">@state.StateName</option>
+                            }
+                            else
+                            {
+                                <option value="@state.StateId">@state.StateName</option>
+                            }
+
+                        }
+                    </select>
+
+                </div>
+                <span asp-validation-for="StateId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="input-group ">
+                    <label asp-for="CountyId" class="control-label"></label>
+                    <select asp-for="CountyId" class="form-control " id="county">
+                        <option value="">شهرستان خود را انتخاب کنید ...</option>
+                        @if (Model.Counties != null)
+                        {
+                            if (Model.Counties.Count() != 0)
+                            {
+                                foreach (var county in Model.Counties)
+                                {
+                                    if (Model.CountyId == county.CountyId)
+                                    {
+                                        <option selected value="@county.CountyId">@county.CountyName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@county.CountyId">@county.CountyName</option>
+                                    }
+                                }
+                            }
+                        }
+
+                    </select>
+
+                </div>
+                <span asp-validation-for="CountyId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HomeAddress" class="control-label"></label>
+                <input asp-for="HomeAddress" class="form-control" />
+                <span asp-validation-for="HomeAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="input-group ">
+                    <label asp-for="Education" class="control-label"></label>
+                    <select asp-for="Education" class="form-control">
+                        <option value="">تحصیلات خود را انتخاب کنید</option>
+                        <option value="زیردیپلم">زیردیپلم</option>
+                        <option value="دیپلم">دیپلم</option>
+                        <option value="فوق دیپلم">فوق دیپلم</option>
+                        <option value="لیسانس">لیسانس</option>
+                        <option value="فوق لیسانس">فوق لیسانس</option>
+                        <option value="دکترا">دکترا</option>
+                    </select>
+
+                </div>
+                <span asp-validation-for="Education" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @{ 
+                    string messA = "حجم عکس نباید از 500 کیلوبایت یا نیم مگا بایت بیشتر باشد" + "\r\n" + "عکس های از نوع زیر قابل قبول هستند :" + "\r\n" +
+                        "jpg , jpeg , gif , png";
+                }
+                <label asp-for="Avatar" class="control-label"></label><span class="fa fa-info-circle red float-xs-left" title="@messA"></span>
+                <input asp-for="Avatar" accept=".jpg,.png,.gif,.jpeg" type="file" class="form-control" />
+                <span id="statusFile" class="m-t-5 m-b-10"></span>
+                <span asp-validation-for="Avatar" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ویرایش" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var arr = ["jpg","jpeg","gif","png"];
+        function GetFileVolume(fid) {
+            var f = $("#" + fid)[0].files[0].size;
+            return f;
+        }
+        function checkExtention(fid) {
+            var ext = $("#" + fid).val().split('.').pop();
+            var status = arr.includes(ext);
+            return status;
+        }
+        $('input[type="file"]').change(function (e) {
+            var ch = checkExtention("Avatar");
+            if (ch === true) {
+                var v = GetFileVolume("Avatar");
+                v = parseInt(v);
+                var _size = 0;
+                if (v < 1048756) {
+                    _size = Math.floor(v / 1024) + ' kb';
+                } else {
+                    _size = Math.floor(v / 1048756) + ' mb';
+                }
+
+                var resv = "<span class='tag tag-warning ltr'>" + _size + "</span>";
+                var res = "<span class='tag tag-danger'>غیرقابل قبول</span>";
+                if (v <= 524288) {
+                    res = "<span class='tag tag-success'>قابل قبول</span>";
+                    $('input[type="submit"]').removeAttr("disabled");
+                }
+                else {
+                    $('input[type="submit"]').attr("disabled", "disabled");
+                }
+                $("#statusFile").html(res + " | " + resv + "<br />");
+            }
+            else {
+                $('input[type="submit"]').attr("disabled", "disabled");
+                $("#statusFile").empty();
+                $("#statusFile").html("<span class = 'tag tag-danger'>لطفا تصویر انتخاب کنید !</span>");
+            }
+            
+        });
+        $("#state").change(function () {
+            var sval = $(this).val();
+            $.ajax({
+                url: "/Admin/AdminUsers/ListCountiesofState",
+                data: { stateId: sval },
+                type: "GET"
+            }).done(function (result) {
+                $("#county").html(result);
+            });
+
+        });
+        $('#BankCardNumber').keypress(function (e) {
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                //display error message
+
+                return false;
+            }
+            var rawNumbers = $(this).val().replace(/-/g, '');
+            var cardLength = rawNumbers.length;
+            if (cardLength !== 0 && cardLength <= 12 && cardLength % 4 == 0) {
+                $(this).val($(this).val() + '-');
+            }
+        });
+
+    });
+</script>

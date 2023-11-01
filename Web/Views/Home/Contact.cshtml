@@ -1,0 +1,135 @@
+﻿@model Core.DTOs.General.ContactVM
+@{
+    ViewData["Title"] = "تماس با ما";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @section MetaTagDescription{
+        <meta content="ارسال پیام برای بخش پشتیانی سازمان فروش بیمه پاسارگاد یا برقراری تماس با شماره تلفن های 88764001 و  88761009" name="descriptison">
+    }
+}
+
+@section HeaderBlack{
+    @(await Component.InvokeAsync("HeaderBlack"))
+}
+
+
+<main id="main">
+
+    <section class="breadcrumbs">
+        <div class="container">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>تماس با ما</h2>
+
+                <ol>
+                    <li><a href="/">بیمه پاسارگاد</a></li>
+                    <li>تماس با ما</li>
+                </ol>
+            </div>
+
+        </div>
+    </section><!-- End Blog Section -->
+    <!-- ======= Contact Section ======= -->
+
+    <section class="contact" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
+        <div class="container">
+            <div class="row">
+                @if (Model.IsSaved == false)
+                {
+                    <div class="offset-md-2 col-md-8 col-xs-12 text-right">
+                        <h4 class="text-xl-center alert alert-success">پیام خود را از طریق فرم زیر ارسال کنید</h4>
+                        <form asp-action="Contact">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="offset-md-2 col-md-8 col-xs-12 form-group">
+                                <div class="form-group">
+
+                                    <input asp-for="FullName" class="form-control" placeholder="نــام کامل" />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+
+                                    <input asp-for="Email" class="form-control" placeholder="ایمیل" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+
+                                    <input asp-for="Subject" class="form-control" placeholder="مــوضوع" />
+                                    <span asp-validation-for="Subject" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <textarea asp-for="Message" class="form-control" maxlength="500" rows="3" placeholder="پیام"></textarea>
+
+                                <span asp-validation-for="Message" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="submit" value="ارسال پیام" class="btn btn-primary col-xl-12 btn-lg" />
+                            </div>
+                        </form>
+                    </div>
+
+
+                    <script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+                    <script src="~/AdminRef/app-assets/js/jquery.unobtrusive-ajax.min.js"></script>
+                    <script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+                    <script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+                }
+                else
+                {
+                    <h4 class="offset-md-2 col-md-8 col-xs-12 text-xl-center alert alert-success">پیام شما با موفقیت ثبت شد</h4>
+                    <a href="/Contact" class="btn btn-warning offset-md-2 col-md-8 col-xs-12 mt-2">پیام جدید</a>
+                }
+
+                <div class="col-lg-12">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="info-box">
+                                <i class="bx bx-map"></i>
+                                <h3>آدرس ما</h3>
+                                <p class="font-size-large">تهران، خیابان سهروردی شمالی - خیابان ابن یمین - نبش خیابان هجدهم - پلاک 13 - طبقه 3</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <i class="bx bx-envelope"></i>
+                                <h3>ایمیل</h3>
+                                <p>pasargadlifeins@yahoo.com</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <i class="bx bx-phone-call"></i>
+                                <h3>تلفن</h3>
+                                <p class="fs-18">021-88764001<br>021-88761009</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+
+        </div>
+
+
+    </section><!-- End Contact Section -->
+    <!-- ======= Map Section ======= -->
+    <section class="map mt-2">
+        <div class="container-fluid p-0">
+
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3238.4104798125877!2d51.437845815260346!3d35.74071438018056!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3f8e03fa22551b21%3A0xabe586eb1ebaf9e2!2sPasargad%20Insurance%20Company!5e0!3m2!1sen!2s!4v1594978160319!5m2!1sen!2s" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+
+        </div>
+    </section>
+
+
+</main>
+@section Footer{
+    @(await Component.InvokeAsync("Footer"))
+}

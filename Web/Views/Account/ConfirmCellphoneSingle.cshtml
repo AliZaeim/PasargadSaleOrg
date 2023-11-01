@@ -1,0 +1,39 @@
+﻿@model Core.DTOs.Account.ConfirmCellphoneSingle
+
+@{
+    ViewData["Title"] = "تایید تلفن همراه";
+    Layout = "~/Views/Shared/_AcLayout.cshtml";
+}
+<div class="row">
+    <div class="container">
+        <h2 class="text-xs-center alert alert-info">تایید تلفن همراه</h2>
+        <form asp-action="ConfirmCellphoneSingle" class="p-2">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="UserCellphone" class="control-label"></label>
+                <input asp-for="UserCellphone" class="form-control" />
+                <span asp-validation-for="UserCellphone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserNC" class="control-label"></label>
+                <input asp-for="UserNC" class="form-control" />
+                <span asp-validation-for="UserNC" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="ارسال" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+        <a href="/Login" class="col-xs-12 text-xs-center btn btn-outline-success mt-2"
+           id="btnLog">
+            قبلا ثبت نام کرده ام !
+        </a>
+        <a href="/" class="col-xs-12 text-xs-center btn btn-outline-info mt-2 mbmm-5">
+            صفحه اصلی
+        </a>
+    </div>
+
+</div>
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>

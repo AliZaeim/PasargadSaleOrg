@@ -1,0 +1,49 @@
+﻿@model DataLayer.Entities.User.RoleCommission
+
+@{
+    ViewData["Title"] = "حذف کارمزد";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">
+    حذف کارمزد
+    <a asp-action="Index" class="btn btn-warning float-xs-left"><i class="fa fa-reply"></i></a>
+</h2>
+<h3 class="text-xs-center alert alert-warning">آیا مطمئن به حذف این کارمزد هستید؟</h3>
+<div>
+    <h4>مشخصات کارمزد</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.PersonalSalesPercent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PersonalSalesPercent)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.OrganizationSalesPercent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.OrganizationSalesPercent)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MinSaleValue)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MinSaleValue)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MinSaleCount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MinSaleCount)
+        </dd>
+
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="حــذف" class="btn btn-danger" /> |
+        <a asp-action="Index">بازگشت</a>
+    </form>
+</div>

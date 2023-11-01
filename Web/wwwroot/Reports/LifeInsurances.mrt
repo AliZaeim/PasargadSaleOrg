@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<StiSerializer version="1.02" type="Net" application="StiReport">
+  <Dictionary Ref="1" type="Dictionary" isKey="true">
+    <BusinessObjects isList="true" count="0" />
+    <Databases isList="true" count="0" />
+    <DataSources isList="true" count="1">
+      <LFBdt Ref="2" type="DataTableSource" isKey="true">
+        <Alias>LFBdt</Alias>
+        <Columns isList="true" count="6">
+          <value>Year,System.Int32</value>
+          <value>Mounth,System.Int32</value>
+          <value>InsNO,System.String</value>
+          <value>IssueDate,System.DateTime</value>
+          <value>CreateDate,System.DateTime</value>
+          <value>IsActive,System.Boolean</value>
+        </Columns>
+        <Dictionary isRef="1" />
+        <Name>LFBdt</Name>
+        <NameInSource>LFBdt</NameInSource>
+      </LFBdt>
+    </DataSources>
+    <Relations isList="true" count="0" />
+    <Report isRef="0" />
+    <Resources isList="true" count="0" />
+    <Variables isList="true" count="0" />
+  </Dictionary>
+  <EngineVersion>EngineV2</EngineVersion>
+  <GlobalizationStrings isList="true" count="0" />
+  <Key>ecbf05da18a4461ab417f7f80d8b9e78</Key>
+  <MetaTags isList="true" count="0" />
+  <Pages isList="true" count="1">
+    <Page1 Ref="3" type="Page" isKey="true">
+      <Border>None;Black;2;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Components isList="true" count="3">
+        <HeaderLFBdt Ref="4" type="HeaderBand" isKey="true">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,0.4,27.7,0.8</ClientRectangle>
+          <Components isList="true" count="6">
+            <HeaderLFBdt_Year Ref="5" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>HeaderLFBdt_Year</Name>
+              <Page isRef="3" />
+              <Parent isRef="4" />
+              <Text>Year</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </HeaderLFBdt_Year>
+            <HeaderLFBdt_Mounth Ref="6" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>3.4,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>HeaderLFBdt_Mounth</Name>
+              <Page isRef="3" />
+              <Parent isRef="4" />
+              <Text>Mounth</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </HeaderLFBdt_Mounth>
+            <HeaderLFBdt_InsNO Ref="7" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>6.8,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>HeaderLFBdt_InsNO</Name>
+              <Page isRef="3" />
+              <Parent isRef="4" />
+              <Text>InsNO</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </HeaderLFBdt_InsNO>
+            <HeaderLFBdt_IssueDate Ref="8" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>10.2,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>HeaderLFBdt_IssueDate</Name>
+              <Page isRef="3" />
+              <Parent isRef="4" />
+              <Text>IssueDate</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </HeaderLFBdt_IssueDate>
+            <HeaderLFBdt_CreateDate Ref="9" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>13.6,0,12.2,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>HeaderLFBdt_CreateDate</Name>
+              <Page isRef="3" />
+              <Parent isRef="4" />
+              <Text>CreateDate</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </HeaderLFBdt_CreateDate>
+            <HeaderLFBdt_IsActive Ref="10" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>25.8,0,1.8,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>HeaderLFBdt_IsActive</Name>
+              <Page isRef="3" />
+              <Parent isRef="4" />
+              <Text>IsActive</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </HeaderLFBdt_IsActive>
+          </Components>
+          <Conditions isList="true" count="0" />
+          <Name>HeaderLFBdt</Name>
+          <Page isRef="3" />
+          <Parent isRef="3" />
+        </HeaderLFBdt>
+        <DataLFBdt Ref="11" type="DataBand" isKey="true">
+          <Brush>Transparent</Brush>
+          <BusinessObjectGuid isNull="true" />
+          <ClientRectangle>0,2,27.7,0.8</ClientRectangle>
+          <Components isList="true" count="6">
+            <DataLFBdt_Year Ref="12" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <CanGrow>True</CanGrow>
+              <ClientRectangle>0,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,8</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>DataLFBdt_Year</Name>
+              <Page isRef="3" />
+              <Parent isRef="11" />
+              <Text>{LFBdt.Year}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </DataLFBdt_Year>
+            <DataLFBdt_Mounth Ref="13" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <CanGrow>True</CanGrow>
+              <ClientRectangle>3.4,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,8</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>DataLFBdt_Mounth</Name>
+              <Page isRef="3" />
+              <Parent isRef="11" />
+              <Text>{LFBdt.Mounth}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </DataLFBdt_Mounth>
+            <DataLFBdt_InsNO Ref="14" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <CanGrow>True</CanGrow>
+              <ClientRectangle>6.8,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,8</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>DataLFBdt_InsNO</Name>
+              <Page isRef="3" />
+              <Parent isRef="11" />
+              <Text>{LFBdt.InsNO}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </DataLFBdt_InsNO>
+            <DataLFBdt_IssueDate Ref="15" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <CanGrow>True</CanGrow>
+              <ClientRectangle>10.2,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,8</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>DataLFBdt_IssueDate</Name>
+              <Page isRef="3" />
+              <Parent isRef="11" />
+              <Text>{LFBdt.IssueDate}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </DataLFBdt_IssueDate>
+            <DataLFBdt_CreateDate Ref="16" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <CanGrow>True</CanGrow>
+              <ClientRectangle>13.6,0,12.2,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,8</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>DataLFBdt_CreateDate</Name>
+              <Page isRef="3" />
+              <Parent isRef="11" />
+              <Text>{LFBdt.CreateDate}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </DataLFBdt_CreateDate>
+            <DataLFBdt_IsActive Ref="17" type="CheckBox" isKey="true">
+              <Brush>Transparent</Brush>
+              <Checked>{LFBdt.IsActive}</Checked>
+              <ClientRectangle>25.8,0,1.8,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <ContourColor>Black</ContourColor>
+              <Name>DataLFBdt_IsActive</Name>
+              <Page isRef="3" />
+              <Parent isRef="11" />
+              <TextBrush>Black</TextBrush>
+            </DataLFBdt_IsActive>
+          </Components>
+          <Conditions isList="true" count="0" />
+          <DataSourceName>LFBdt</DataSourceName>
+          <Filters isList="true" count="0" />
+          <Name>DataLFBdt</Name>
+          <Page isRef="3" />
+          <Parent isRef="3" />
+          <Sort isList="true" count="0" />
+        </DataLFBdt>
+        <FooterLFBdt Ref="18" type="FooterBand" isKey="true">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,3.6,27.7,0.8</ClientRectangle>
+          <Components isList="true" count="6">
+            <FooterLFBdt_Year Ref="19" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterLFBdt_Year</Name>
+              <Page isRef="3" />
+              <Parent isRef="18" />
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </FooterLFBdt_Year>
+            <FooterLFBdt_Mounth Ref="20" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>3.4,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterLFBdt_Mounth</Name>
+              <Page isRef="3" />
+              <Parent isRef="18" />
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </FooterLFBdt_Mounth>
+            <FooterLFBdt_InsNO Ref="21" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>6.8,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterLFBdt_InsNO</Name>
+              <Page isRef="3" />
+              <Parent isRef="18" />
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </FooterLFBdt_InsNO>
+            <FooterLFBdt_IssueDate Ref="22" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>10.2,0,3.4,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterLFBdt_IssueDate</Name>
+              <Page isRef="3" />
+              <Parent isRef="18" />
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </FooterLFBdt_IssueDate>
+            <FooterLFBdt_CreateDate Ref="23" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>13.6,0,12.2,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterLFBdt_CreateDate</Name>
+              <Page isRef="3" />
+              <Parent isRef="18" />
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </FooterLFBdt_CreateDate>
+            <FooterLFBdt_IsActive Ref="24" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>25.8,0,1.8,0.8</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterLFBdt_IsActive</Name>
+              <Page isRef="3" />
+              <Parent isRef="18" />
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <VertAlignment>Center</VertAlignment>
+            </FooterLFBdt_IsActive>
+          </Components>
+          <Conditions isList="true" count="0" />
+          <Name>FooterLFBdt</Name>
+          <Page isRef="3" />
+          <Parent isRef="3" />
+        </FooterLFBdt>
+      </Components>
+      <Conditions isList="true" count="0" />
+      <Guid>4464117b84684013a079feabcf1bb786</Guid>
+      <Margins>1,1,1,1</Margins>
+      <Name>Page1</Name>
+      <Orientation>Landscape</Orientation>
+      <PageHeight>21</PageHeight>
+      <PageWidth>29.7</PageWidth>
+      <Report isRef="0" />
+      <RightToLeft>True</RightToLeft>
+      <StretchToPrintArea>True</StretchToPrintArea>
+      <TitleBeforeHeader>True</TitleBeforeHeader>
+      <Watermark Ref="25" type="Stimulsoft.Report.Components.StiWatermark" isKey="true">
+        <AspectRatio>True</AspectRatio>
+        <Font>B Titr,16.27826,Bold,Point,False,178</Font>
+        <RightToLeft>True</RightToLeft>
+        <ShowImageBehind>False</ShowImageBehind>
+        <TextBrush>HatchBrush,BackwardDiagonal,White,Silver</TextBrush>
+      </Watermark>
+    </Page1>
+  </Pages>
+  <ReferencedAssemblies isList="true" count="8">
+    <value>System.Dll</value>
+    <value>System.Drawing.Dll</value>
+    <value>System.Windows.Forms.Dll</value>
+    <value>System.Data.Dll</value>
+    <value>System.Xml.Dll</value>
+    <value>Stimulsoft.Controls.Dll</value>
+    <value>Stimulsoft.Base.Dll</value>
+    <value>Stimulsoft.Report.Dll</value>
+  </ReferencedAssemblies>
+  <ReportAlias>Report</ReportAlias>
+  <ReportChanged>7/12/2020 7:27:41 PM</ReportChanged>
+  <ReportCreated>7/11/2020 3:40:27 PM</ReportCreated>
+  <ReportFile>E:\VS2019\PasargadSalesOrg - 99413\Web\wwwroot\Reports\LifeInsurances.mrt</ReportFile>
+  <ReportGuid>565682601a024758848c16a2e1223934</ReportGuid>
+  <ReportName>Report</ReportName>
+  <ReportUnit>Centimeters</ReportUnit>
+  <ReportVersion>2019.2.3.0</ReportVersion>
+  <Script>using System;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Data;
+using Stimulsoft.Controls;
+using Stimulsoft.Base.Drawing;
+using Stimulsoft.Report;
+using Stimulsoft.Report.Dialogs;
+using Stimulsoft.Report.Components;
+
+namespace Reports
+{
+    public class Report : Stimulsoft.Report.StiReport
+    {
+        public Report()        {
+            this.InitializeComponent();
+        }
+
+        #region StiReport Designer generated code - do not modify
+		#endregion StiReport Designer generated code - do not modify
+    }
+}
+</Script>
+  <ScriptLanguage>CSharp</ScriptLanguage>
+  <Styles isList="true" count="0" />
+</StiSerializer>

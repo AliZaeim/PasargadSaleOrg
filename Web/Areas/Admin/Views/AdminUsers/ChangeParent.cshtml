@@ -1,0 +1,48 @@
+﻿@model Core.DTOs.Admin.ChangeParentViewModel
+    
+
+
+<h4 class="text-xs-center alert alert-info">تغییر ناظر : @Model.userRole.User.FullName | @Model.userRole.Role.RoleTitle</h4>
+<div class="row">
+    <div class="col-xs-12" id="chp">
+        <form asp-action="ChangeParent" asp-controller="AdminUsers" asp-area="Admin"
+              data-ajax="true"
+              data-ajax-method="POST"
+              data-ajax-mode="replace"
+              data-ajax-update="#chp">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="User_URId" />
+            <div class="form-group">
+                @if (Model.CuParent != null)
+                {
+                    <span>ناظر فعلی : </span>
+                    <span class="tag tag-info text-white">@Model.CuParent.User.FullName | @Model.CuParent.Role.RoleTitle با نظارت :  @Model.CuParent.UserRoleParent?.FullPro</span>
+                }
+                else
+                {
+                    <span>ناظر فعلی : -</span>
+                }
+
+            </div>
+            <div class="form-group">
+                <label asp-for="User_NewParent_URId" class="control-label"></label>
+
+                <select asp-for="User_NewParent_URId" class="form-control">
+                    <option value="">ناظر جدید را انتخاب کنید...</option>
+                    @foreach (var item in Model.Parents)
+                    {
+                        <option value="@item.URId"> @item.User.FullName | @item.Role.RoleTitle <text>با نظارت : </text> @item.UserRoleParent?.FullPro</option>
+                    }
+                </select>
+                <span asp-validation-for="User_NewParent_URId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ثبت" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+

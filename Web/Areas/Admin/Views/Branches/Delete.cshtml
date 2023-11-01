@@ -1,0 +1,76 @@
+﻿@model DataLayer.Entities.ComplementaryInfo.Branch
+
+@{
+    ViewData["Title"] = "حذف شعبه";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">حذف شعبه</h2>
+
+<h3>آیا مطمئن به حذف شعبه هستید ؟</h3>
+<div>
+    <h4>اطلاعات شعبه</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BrName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BrName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BrCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BrCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BrField)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BrField)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BrAttribution)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BrAttribution)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ManagerName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ManagerName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DateofStablishment)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateofStablishment)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Fax)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Fax)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="حـــذف" class="btn btn-danger" /> |
+        <a asp-action="Index">بازگشت</a>
+    </form>
+</div>

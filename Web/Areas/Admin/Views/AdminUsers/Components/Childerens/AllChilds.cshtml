@@ -1,0 +1,615 @@
+﻿@model Core.DTOs.General.ShowChilderensVM
+@using DataLayer.Entities.User;
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@{
+
+
+
+}
+
+<style>
+
+    figure {
+        overflow: scroll;
+        min-height: 92vh;
+        background-color: white;
+        border: 1px solid black;
+        text-align: center;
+    }
+
+
+
+    /* It's supposed to look like a tree diagram */
+    .tree, .tree ul, .tree li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: relative;
+    }
+
+    .tree {
+        margin: 0 0 1em;
+        text-align: center;
+        font-size: 11px;
+        padding: 10mm;
+        padding-top: 3mm;
+    }
+
+        .tree, .tree ul {
+            display: table;
+            overflow-x: scroll;
+        }
+
+
+
+            .tree li {
+                display: table-cell;
+                padding: .5em 0;
+                vertical-align: top;
+                min-width: 20mm;
+                width: auto;
+                white-space: nowrap;
+            }
+                /* _________ */
+                .tree li:before {
+                    outline: solid 1px #666;
+                    content: "";
+                    left: 0;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                }
+
+                .tree li:first-child:before {
+                    right: 50%;
+                }
+
+                .tree li:last-child:before {
+                    left: 50%;
+                }
+
+            .tree code, .tree span {
+                border: solid .1em #666;
+                border-radius: .2em;
+                display: inline-block;
+                margin: 0 .2em .5em;
+                padding: .2em .5em;
+                position: relative;
+                white-space: nowrap;
+            }
+
+
+                /* | */
+                .tree ul:before,
+                .tree code:before,
+                .tree span:before {
+                    outline: solid 1px #666;
+                    content: "";
+                    height: .5em;
+                    right: 50%;
+                    position: absolute;
+                }
+
+            .tree ul:before {
+                top: -.55em;
+            }
+
+            .tree code:before,
+            .tree span:before {
+                top: -.55em;
+            }
+
+            /* The root node doesn't connect upwards */
+            .tree > li {
+                margin-top: 0;
+                padding: 0 !important;
+            }
+
+                .tree > li:before,
+                .tree > li:after,
+                .tree > li > code:before,
+                .tree > li > span:before {
+                    outline: none;
+                }
+
+            .tree li span:hover {
+                cursor: pointer;
+            }
+    /*.tree li span:hover, .tree li span:hover + ul li span {
+                background: #c8e4f8;
+                color: #000;
+                border: 1px solid #94a0b4;
+                cursor: pointer;
+            }*/
+    /*Connector styles on hover*/
+    /*.tree li span:hover + ul li::after,
+                .tree li span:hover + ul li::before,
+                .tree li span:hover + ul::before,
+                .tree li span:hover + ul ul::before {
+                    border-color: #94a0b4;
+                }*/
+
+    .zlabelLeftRelative {
+        position: relative;
+        display: inline-block;
+        float: left;
+        background: #f1eeee;
+        color: #4800ff;
+        min-width: 3mm;
+        width: auto;
+        display: block;
+        height: 6mm;
+        left: -1.5mm;
+        padding-top: .5mm;
+        text-align: center;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .zlabelRightRelative {
+        position: relative;
+        display: inline-block;
+        float: right;
+        background: #f1eeee;
+        color: #ff6a00;
+        min-width: 3mm;
+        width: auto;
+        display: block;
+        height: 6mm;
+        right: -1.5mm;
+        padding-top: .5mm;
+        text-align: center;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+
+    .zbginfo {
+        background-color: #0094ff;
+    }
+
+    .zbgwhite {
+        background-color: white;
+    }
+
+    mark {
+        background: orange;
+    }
+
+        mark.current {
+            background: green;
+            color: white;
+        }
+
+    .header {
+        background: #f6f6f6;
+    }
+
+        .header button {
+            margin: 0 auto;
+            text-align: center;
+            width: auto;
+        }
+
+    .magnify {
+        position: relative;
+        width: 900px;
+        height: 675px;
+    }
+
+    .magnify_glass {
+        z-index: 100;
+        position: absolute;
+        overflow: hidden;
+    }
+
+    .element_to_magnify {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+    }
+
+    #elementBeingMagnified {
+    }
+
+    .magnified_element {
+    }
+</style>
+
+
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+
+
+
+<link href="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.min.css" rel="stylesheet" />
+<script src="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.min.js"></script>
+
+<div class="row  mb-2">
+    <div class="col-md-3 col-xs-12">
+        <p class="fs-11 font-weight-bold info">با کلیک نام در چارت،آمار همکاران نمایش داده خواهد شد</p>
+        <p>
+
+            <select lang="fa" class="selectpicker  form-control border-black  mt-4  show-menu-arrow "
+                    data-live-search="true" data-actions-box="true"
+                    data-header="کاربر مورد نظر خود را جهت رسم چارت انتخاب کنید"
+                    data-style="btn-light" data-selected-text-format="count > 1"
+                    @*data-dropdownAlignRight="true"*@ onchange="location = this.value;">
+                <option value="/Admin/ShowChilderens">@Model.ActiveLoginUserRole.FullPro</option>
+                @foreach (var item in Model.LoginUserChilderens.Where(w => w.User.IsActive == true && w.IsActive == true))
+                {
+                    if (item.URId == Model.ActiveSelectedUser_UserRole.URId)
+                    {
+                        <option selected value="/Admin/ShowChilderens?code=@item.User.Code">@item.FullPro</option>
+                    }
+                    else
+                    {
+                        <option value="/Admin/ShowChilderens?code=@item.User.Code">@item.FullPro</option>
+                    }
+                }
+            </select>
+
+        </p>
+    </div>
+    <div class="col-md-6 col-xs-12">
+        <h5 class="text-xs-center pb-1 rounded mb-0 text-info Bold">
+            چارت سازمان فروش @Model.ActiveSelectedUser_UserRole.FullPro
+        </h5>
+        <div class="header text-xs-center">
+            <input type="search" name="search" class="col-md-6" autocomplete="off" id="InpSearch" placeholder="جستجو..." />
+            <button class="text-xs-center blue" data-search="next" title="بعدی">&darr;</button>
+            <button class="text-xs-center green" data-search="prev" title="قبلی">&uarr;</button>
+            <span class=" border text-xs-center ind pr-1mm pl-1mm">0</span>
+            <button class="text-xs-center red" data-search="clear" title="پاکسازی جستجو">&#10802;</button>
+            &ensp;&#9474;&ensp;
+            <button type="button" id="btn_ZoomIn" title="بزرگنمایی" class="text-xs-center warning">&#65291;</button>
+            <button type="button" id="btn_ZoomOut" title="کوچکنمایی" class="text-xs-center success">&#8722;</button>
+            <button type="button" id="btn_ZoomReset" title="حالت اولیه زوم" class="text-xs-center red">&#8634;</button>
+        </div>
+
+    </div>
+    <div class="col-md-3 col-xs-12" id="Div3">
+
+
+    </div>
+
+</div>
+
+
+
+<figure class="row" id="zfigure">
+
+    <ul class="tree" id="ztree">
+        <li>
+            <span data-dir-count="@Model.ActiveSelectedUser_UserRole.Childeren.Where(w => w.IsActive).Count()">@Model.ActiveSelectedUser_UserRole.User.FullName<br />@Model.ActiveSelectedUser_UserRole.Role.RoleTitle | @Model.ActiveSelectedUser_UserRole.User.Code</span>
+            @if (Model.ActiveSelectedUser_UserRole.Childeren.Where(w => w.IsActive).Count() != 0)
+            {
+
+                <ul>
+                    @foreach (var child1 in Model.ActiveSelectedUser_UserRole.Childeren.Where(w => w.IsActive))
+                    {
+                        UserRole Gchild1 = await _userService.GetUserRoleByIdAsync(child1.URId);
+                        <li>
+                            <span data-dir-count="@Gchild1.Childeren.Where(w => w.IsActive).Count()" title="@Gchild1.FullPro | @Gchild1.User.Code">@Gchild1.User.FullName<br />@Gchild1.Role.RoleTitle | @Gchild1.User.Code</span>
+                            @if (Gchild1.Childeren.Where(w => w.IsActive).Count() != 0)
+                            {
+                                <ul>
+                                    @foreach (var child2 in Gchild1.Childeren.Where(w => w.IsActive))
+                                    {
+                                        UserRole Gchild2 = await _userService.GetUserRoleByIdAsync(child2.URId);
+                                        <li>
+                                            <span data-dir-count="@Gchild2.Childeren.Where(w => w.IsActive).Count()" title="@Gchild2.FullPro | @Gchild2.User.Code">@Gchild2.User.FullName<br />@Gchild2.Role.RoleTitle | @Gchild2.User.Code</span>
+                                            @if (Gchild2.Childeren.Where(w => w.IsActive).Count() != 0)
+                                            {
+                                                <ul>
+                                                    @foreach (var child3 in Gchild2.Childeren.Where(w => w.IsActive))
+                                                    {
+                                                        UserRole Gchild3 = await _userService.GetUserRoleByIdAsync(child3.URId);
+                                                        <li>
+                                                            <span data-dir-count="@Gchild3.Childeren.Where(w => w.IsActive).Count()" title="@Gchild3.FullPro | @Gchild3.User.Code">@Gchild3.User.FullName<br />@Gchild3.Role.RoleTitle | @Gchild3.User.Code</span>
+                                                            @if (Gchild3.Childeren.Where(w => w.IsActive).Count() != 0)
+                                                            {
+                                                                <ul>
+                                                                    @foreach (var child4 in Gchild3.Childeren.Where(w => w.IsActive))
+                                                                    {
+                                                                        UserRole Gchild4 = await _userService.GetUserRoleByIdAsync(child4.URId);
+                                                                        <li>
+                                                                            <span data-dir-count="@Gchild4.Childeren.Where(w => w.IsActive).Count()" title="@Gchild4.FullPro | @Gchild4.User.Code">@Gchild4.User.FullName<br />@Gchild4.Role.RoleTitle | @Gchild4.User.Code</span>
+                                                                            @if (Gchild4.Childeren.Where(w => w.IsActive).Count() != 0)
+                                                                            {
+                                                                                <ul>
+                                                                                    @foreach (var child5 in Gchild4.Childeren.Where(w => w.IsActive))
+                                                                                    {
+                                                                                        UserRole Gchild5 = await _userService.GetUserRoleByIdAsync(child5.URId);
+                                                                                        <li>
+                                                                                            <span data-dir-count="@Gchild5.Childeren.Where(w => w.IsActive).Count()" title="@Gchild5.FullPro | @Gchild5.User.Code">@Gchild5.User.FullName<br />@Gchild5.Role.RoleTitle | @Gchild5.User.Code</span>
+                                                                                            @if (child5.Childeren.Where(w => w.IsActive).Count() != 0)
+                                                                                            {
+                                                                                                <ul>
+                                                                                                    @foreach (var child6 in Gchild5.Childeren.Where(w => w.IsActive))
+                                                                                                    {
+                                                                                                        UserRole Gchild6 = await _userService.GetUserRoleByIdAsync(child6.URId);
+                                                                                                        <li>
+                                                                                                            <span data-dir-count="@Gchild6.Childeren.Where(w => w.IsActive).Count()" title="@Gchild6.FullPro | @Gchild6.User.Code">@Gchild6.User.FullName<br />@Gchild6.Role.RoleTitle | @Gchild6.User.Code</span>
+                                                                                                            @if (child6.Childeren.Where(w => w.IsActive).Count() != 0)
+                                                                                                            {
+                                                                                                                <ul>
+                                                                                                                    @foreach (var child7 in Gchild6.Childeren.Where(w => w.IsActive))
+                                                                                                                    {
+                                                                                                                        UserRole Gchild7 = await _userService.GetUserRoleByIdAsync(child7.URId);
+                                                                                                                        <li>
+                                                                                                                            <span data-dir-count="@Gchild7.Childeren.Where(w => w.IsActive).Count()" title="@Gchild7.FullPro | @Gchild7.User.Code">@Gchild7.User.FullName<br />@Gchild7.Role.RoleTitle | @Gchild7.User.Code</span>
+                                                                                                                            @if (Gchild7.Childeren.Where(w => w.IsActive).Count() != 0)
+                                                                                                                            {
+                                                                                                                                <ul>
+                                                                                                                                    @foreach (var child8 in Gchild7.Childeren.Where(w => w.IsActive))
+                                                                                                                                    {
+                                                                                                                                        UserRole Gchild8 = await _userService.GetUserRoleByIdAsync(child8.URId);
+                                                                                                                                        <li>
+                                                                                                                                            <span data-dir-count="@Gchild8.Childeren.Where(w => w.IsActive).Count()" title="@Gchild8.FullPro | @Gchild8.User.Code">@Gchild8.User.FullName<br />@Gchild8.Role.RoleTitle | @Gchild8.User.Code</span>
+                                                                                                                                            @if (Gchild8.Childeren.Where(w => w.IsActive).Count() != 0)
+                                                                                                                                            {
+                                                                                                                                                <ul>
+                                                                                                                                                    @foreach (var child9 in Gchild8.Childeren.Where(w => w.IsActive))
+                                                                                                                                                    {
+                                                                                                                                                        UserRole Gchild9 = await _userService.GetUserRoleByIdAsync(child9.URId);
+                                                                                                                                                        <li class="w-auto">
+                                                                                                                                                            <span data-dir-count="@Gchild9.Childeren.Where(w => w.IsActive).Count()" title="@Gchild9.FullPro | @Gchild9.User.Code">@Gchild9.User.FullName<br />@Gchild9.Role.RoleTitle | @Gchild9.User.Code</span>
+                                                                                                                                                        </li>
+                                                                                                                                                    }
+                                                                                                                                                </ul>
+                                                                                                                                            }
+                                                                                                                                        </li>
+                                                                                                                                    }
+                                                                                                                                </ul>
+                                                                                                                            }
+                                                                                                                        </li>
+                                                                                                                    }
+                                                                                                                </ul>
+                                                                                                            }
+                                                                                                        </li>
+                                                                                                    }
+                                                                                                </ul>
+                                                                                            }
+                                                                                        </li>
+                                                                                    }
+                                                                                </ul>
+                                                                            }
+                                                                        </li>
+                                                                    }
+                                                                </ul>
+                                                            }
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+    </ul>
+</figure>
+
+<script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+
+
+<script type="text/javascript">
+
+    $(function () {
+
+
+        // the input field
+        var $input = $("input[type='search']"),
+            // clear button
+            $clearBtn = $("button[data-search='clear']"),
+            // prev button
+            $prevBtn = $("button[data-search='prev']"),
+            // next button
+            $nextBtn = $("button[data-search='next']"),
+            // the context where to search
+            $content = new Mark(document.querySelector("ul.tree")),
+            // jQuery object to save <mark> elements
+            $results,
+            // the class that will be appended to the current
+            // focused element
+            currentClass = "current",
+            // top offset for the jump (the search bar)
+            offsetTop = 100,
+            // the current index of the focused element
+            currentIndex = 0;
+
+
+        /**
+         * Jumps to the element matching the currentIndex
+         */
+        function jumpTo() {
+            if ($results.length) {
+                var positiontop,
+                    $current = $results.eq(currentIndex)
+
+                $results.removeClass(currentClass);
+                if ($current.length) {
+                    $current.addClass(currentClass);
+                    positiontop = $current.offset().top - offsetTop;
+
+                    var leftOffset = $current.offset().left - $("#zfigure").offset().left + $("#zfigure").scrollLeft();
+                    //$("#zfigure").scrollTo(leftOffset, positiontop)/*.animate*/;
+                    $("#zfigure").animate({ scrollLeft: leftOffset - $("#zfigure").innerWidth() / 2 });
+                    $("#zfigure").animate({ scrollTop: positiontop - 100 });
+
+
+
+                }
+            }
+        }
+
+        /**
+         * Searches for the entered keyword in the
+         * specified context on input
+         */
+        $input.on("keypress", function (e) {
+            if (e.keyCode === 13) {
+                var searchVal = this.value;
+                $content.unmark({
+                    done: function () {
+                        $content.mark(searchVal, {
+                            separateWordSearch: false,
+                            "accuracy": "exactly",
+                            "noMatch": function () {
+                                $(".srchMess").remove();
+                                $(".ind").text(0);
+                                $("#Div3").append("<p class='srchMess col-xs-12  text-xs-center text-warning '>موردی یافت نشد</p>");
+                            },
+                            done: function (counter) {
+                                $results = $content.find("mark");
+                                $(".srchMess").remove();
+
+                                if (counter == 0) {
+                                    $("#Div3").append("<p class='srchMess col-xs-12 fs-18 text-xs-center text-danger '>" + "عبارت " + searchVal + " " + counter + " " + "مورد یافت شد !" + "</p>");
+                                    $(".ind").text(0);
+                                }
+                                else {
+                                    $("#Div3").append("<p class='srchMess col-xs-12 fs-18 text-xs-center text-success '>" + "عبارت " + searchVal + " " + counter + " " + "مورد یافت شد !" + "</p>");
+                                    $(".ind").text(1);
+                                }
+
+                                //currentIndex = -1;
+                                jumpTo();
+
+                            }
+                        });
+                    }
+                });
+            }
+
+        });
+
+        /**
+         * Clears the search
+         */
+        $clearBtn.on("click", function () {
+            $content.unmark();
+            $input.val("").focus();
+            $(".ind").text(0);
+            $(".srchMess").remove();
+        });
+
+        /**
+         * Next and previous search jump to
+         */
+        $nextBtn.add($prevBtn).on("click", function () {
+            if ($results.length) {
+                currentIndex += $(this).is($prevBtn) ? -1 : 1;
+
+                if (currentIndex < 0) {
+                    currentIndex = $results.length - 1;
+                }
+                if (currentIndex > $results.length - 1) {
+                    currentIndex = 0;
+                }
+                $(".ind").text(currentIndex + 1);
+                jumpTo();
+
+
+            }
+        });
+    });
+
+    $('.selectpicker').selectpicker({
+        selectAllText: '<span class="text-success fs-18 border col-xs-12">هــمه</span>',
+        deselectAllText: '<span class="text-danger fs-18 border col-xs-12">هیــچکدام</span>',
+        showContent: "true",
+        liveSearchPlaceholder: "جستجوی کاربر ...",
+        container: "true",
+        countSelectedText: "{0} کاربر انتخاب شده",
+        showTick: "true",
+        tickIcon: "fa fa-check",
+        virtualScroll: "true",
+        noneResultsText: "<span class='text-danger'>کاربری یافت نشد !</span>"
+    });
+
+
+    $(document).ready(function () {
+
+
+        var scrollPosition = ($("#zfigure").offset().left + $("#zfigure").scrollLeft() + $('#zfigure').innerWidth()) / 2;
+        var currentZoom = 1.0;
+        $("#zfigure").scrollLeft(scrollPosition);
+     
+        
+        $(".tree li span").click(function () {
+            var stCount = $(".tree li .st").length;
+
+            if (stCount === 0) {
+                $(".tree li .st").remove();
+                $(this).css("color", "red");
+                var all = $(this).next("ul").find("li").length;
+                var dirr = $(this).attr("data-dir-count");
+                $(this).next().find("li").css("color", "info");
+                $(this).find('.st').remove();
+
+
+                var NewLineParent = "<p class='block st'>" +
+                    "<b  title='همکاران مستقیم' class='zlabelRightRelative'>" + dirr + "</b>" +
+                    "<b  title='کل همکاران' class='zlabelLeftRelative'>" + all + "</b>";
+                + "</p>";
+                $(this).append(NewLineParent);
+
+                ($(this).next().find("li")).each(function (index, item) {
+
+                    var itemdirCount = $(item).children("span").attr("data-dir-count");
+                    var itemallCount = $(this).find("li").length;
+                    var NewLine = "<p class='block st border-bottom'>" +
+                        "<b  title='همکاران مستقیم' class='zlabelRightRelative'>" + itemdirCount + "</b>" +
+                        "<b  title='کل همکاران' class='zlabelLeftRelative'>" + itemallCount + "</b>";
+                    + "</p>";
+
+
+                    $(item).children("span").append(NewLine);
+                    $(item).css("height", "6mm !important");
+
+
+                });
+            }
+            else {
+                $(this).css("color", "black");
+                $(".tree li span").css("color", "black");
+                $(".tree li .st").remove();
+
+            }
+
+
+
+
+
+        });
+        $('#btn_ZoomIn').click(
+            function () {
+                $('#zfigure').animate({ 'zoom': currentZoom += .1 }, 'slow');
+            });
+        $('#btn_ZoomOut').click(
+            function () {
+                $('#zfigure').animate({ 'zoom': currentZoom -= .1 }, 'slow');
+            });
+        $('#btn_ZoomReset').click(
+            function () {
+                currentZoom = 1.0
+                $('#zfigure').animate({ 'zoom': 1 }, 'slow');
+            });
+
+
+    });
+
+
+
+
+</script>
+
+

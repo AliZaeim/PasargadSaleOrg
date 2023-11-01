@@ -1,0 +1,53 @@
+﻿@model IEnumerable<DataLayer.Entities.Blogs.NewsGroup>
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@{
+    ViewData["Title"] = "گروه های خبر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="text-xs-center alert alert-info">گروه های خبر</h1>
+
+    <p>
+        <a asp-action="Create" class="btn btn-success">ایجاد گروه</a>
+    </p>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.NewsGroup_Title)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.NewsgGroup_Comment)
+            </th>
+
+            <th class="text-xs-center align-middle">عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.NewsGroup_Title)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.NewsgGroup_Comment)
+                </td>
+
+                <td class="text-xs-center align-middle">
+                    @if (_userService.CheckPermissionByNameAsync(81, User.Identity.Name))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.NewsGroup_Id">ویرایش</a> <span> | </span>
+                    }
+                    @if (_userService.CheckPermissionByNameAsync(82, User.Identity.Name))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.NewsGroup_Id">حذف</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

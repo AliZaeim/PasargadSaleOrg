@@ -1,0 +1,109 @@
+﻿@model DataLayer.Entities.LifeBordro.LifeBordroBase
+@using Core.Convertors;
+@using System.Text.RegularExpressions;
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@inject IBordroService _bordroService
+@{
+    ViewData["Title"] = "جزئیات بیمه نامه شماره " + Model.InsNO;
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">جزئیات بیمه نامه شماره <br /> @Model.InsNO</h2>
+
+<div>
+
+    <dl class="inline">
+        <dt>
+            @Html.DisplayNameFor(model => model.InsNO)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InsNO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IssueDate)
+        </dt>
+        <dd>
+            @Model.IssueDate.ToShamsi()
+        </dd>
+
+        <dt>
+            وضعیت
+        </dt>
+        <dd>
+            @Model.LifeBordroAdditions.FirstOrDefault(f => f.IsActive).Status
+        </dd>
+
+    </dl>
+
+
+</div>
+<div class="m-b-20">
+
+    <span>سازمان فروش : </span>
+    
+    @{
+        List<DataLayer.Entities.LifeBordro.SalesObject> salesObjects = await _bordroService.GetSalesObjectsofBordroAsync(Model.Id);
+        if(salesObjects !=null)
+        {
+            foreach (var item in salesObjects.OrderBy(r => r.SRate).SkipLast(1))
+            {
+                <span class="tag tag-info">@item.UserRole.FullPro</span>
+            }
+        }
+
+    }
+
+</div>
+
+<h3 class="text-xs-center alert alert-warning">الحاقیه ها</h3>
+<div>
+
+    @foreach (var item in Model.LifeBordroAdditions.OrderByDescending(r => r.Number))
+    {
+    <div class="border-grey col-xs-12 p-t-10 p-b-10 m-b-10 fs-12">
+        @if (item.IsActive == false)
+        {
+            <span class="white col-xs-12 text-xs-center bg-danger mb-1">غیرفعال</span>
+        }
+        else
+        {
+            <span class="white col-xs-12 text-xs-center bg-success mb-1">فعال</span>
+        }
+
+        <p>
+            <span class="col-md-3">شماره الحاقیه : @item.Number</span>
+            <span class="col-md-3">تاریخ شروع الحاقیه : @item.StartDate.ToShamsiN()</span>
+            <span class="col-md-3">تاریخ شروع اولیه : @item.InitialStartDate.ToShamsi()</span>
+            <span class="col-md-3">نوع الحاقیه : @item.Type</span>
+        </p>
+        <p>
+            <span class="col-md-3">بیمه گذار : @item.InsurerFullName</span>
+            <span class="col-md-3">کد ملی : @item.InsurerNC</span>
+            <span class="col-md-3">بیمه شده : @item.InsuredFullName</span>
+            <span class="col-md-3">کد ملی : @item.InsuredNC</span>
+        </p>
+        <p>
+            <span class="col-md-3">مدت : @item.Duration</span>
+            <span class="col-md-3">روش پرداخت : @item.PaymentMethod</span>
+            <span class="col-md-3">حق بیمه بر حسب روش پرداخت : @item.PremiumbyPaymentMethod.ToString("N0")</span>
+            <span class="col-md-3">سپرده : @item.Deposit.ToString("N0")</span>
+        </p>
+        <p>
+            <span class="col-md-3">حق بیمه عمر : @Math.Abs(item.LFPremium).ToString("N0")</span>
+            <span class="col-md-3">حق بیمه تکمیلی : @item.SupPremium.ToString("N0")</span>
+            <span class="col-md-3">سرمایه خطر فوت : @item.CapitalDied.ToString("N0")</span>
+            @{
+                string seller = Regex.Replace(item.Seller, @"\d", "");
+            }
+            <span class="col-md-3">نماینده فروش : @seller</span>
+        </p>
+    </div>
+    }
+
+</div>
+<div>
+
+    <a href="@ViewData["retUrl"].ToString()" class="float-xs-left m-t-20">بازگشت</a>
+</div>

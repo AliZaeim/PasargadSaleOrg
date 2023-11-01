@@ -1,0 +1,59 @@
+﻿@model DataLayer.Entities.Blogs.News
+@using Core.Convertors;
+@{
+    ViewData["Title"] = "حذف خبر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="text-xs-center alert alert-info">حــذف خبر</h1>
+
+<h3 class="text-xs-center alert alert-warning">آیا مطمئن به حذف خبر هستید ؟</h3>
+<div>
+   
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Code)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.News_Code)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Date)
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.News_Date.ToShamsiWithTime()
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Title)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.News_Title)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.News_Abstract)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.News_Abstract)
+        </dd>
+        
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Publisher_Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Publisher.Publisher_Title)
+        </dd>
+       
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NewsGroup)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NewsGroup.NewsGroup_Title)
+        </dd class>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="News_Id" />
+        <input type="submit" value="حــذف" class="btn btn-danger" /> |
+        <a asp-action="Index">بازگشت</a>
+    </form>
+</div>

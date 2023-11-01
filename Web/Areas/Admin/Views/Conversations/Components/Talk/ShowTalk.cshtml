@@ -1,0 +1,181 @@
+﻿@model DataLayer.Entities.ComplementaryInfo.Conversation
+@using Core.Convertors;
+@{ 
+    string ZbgColor = string.Empty;
+    if(Model.SenderCode == "290070")
+    {
+        ZbgColor = "bg-warning";
+    }
+    else
+    {
+        ZbgColor = "bg-info";
+    }
+}
+<div class="row border rounded m-t-10 " id="@Model.Id">
+    <header class="col-xs-12 rounded  @ZbgColor border-bottom">
+        <div class="col-md-4 col-xs-12 text-md-right text-xs-center">
+            <span class="tag tag-striped p-r-1 p-l-1 fs-11" title="تاریخ ثبت">@Model.CreateDate.ToShamsiWithTime()</span>
+            @{
+                List<string> readers = Model.ReadersList.ToList();
+                readers = readers.Where(w => !string.IsNullOrEmpty(w)).ToList();
+                List<string> receps = Model.RecepiesList.ToList();
+                receps = receps.Where(w => !string.IsNullOrEmpty(w)).ToList();
+                string vis = string.Empty;
+                bool IsVis = true;
+                if (Model.SenderCode != User.Identity.Name)
+                {
+                    
+                        if (receps.Any(a => a.Substring(0, a.IndexOf("-")) == User.Identity.Name))
+                        {
+                            if (!readers.Any(a => a.Substring(0, a.IndexOf("-")) == User.Identity.Name))
+                            {
+                                vis = "hidden";
+                                IsVis = false;
+                            }
+                        }
+                   
+
+                }
+            }
+
+            @if (Model.SenderCode == User.Identity.Name)
+            {
+
+                @if (Model.SenderCode == "290070")
+                {
+                    if (receps != null)
+                    {
+                        @if (receps.Count() > 1)
+                        {
+                            <span class="tag tag-success fs-11 tag-pill">@readers.Count()</span>
+                            <span class="fs-11"> نفر از </span>
+                            <span class="tag tag-info fs-11 tag-pill">@receps.Count()</span>
+                            <span class="fs-11"> نفر خوانده</span>
+                        }
+                        else
+                        {
+                            if (Model.Readers != null)
+                            {
+                                string rdr = readers.FirstOrDefault();
+                                DateTime? RdateTime = null;
+                                string[] row = rdr.Split("-");
+                                RdateTime = DateTime.Parse(row[1].ToString());
+                                <span class="tag tag-success p-r-1 p-l-1 fs-11" title="تاریخ خوانده شدن">خوانده شده در @RdateTime.ToShamsiN_WithTime() </span>
+                            }
+
+                        }
+                    }
+
+
+                }
+                else
+                {
+
+                    if (readers.Any(a => a.Substring(0, a.IndexOf("-")) == "290070"))
+                    {
+                        string rdr = readers.FirstOrDefault(f => f.Substring(0, f.IndexOf("-")) == "290070");
+                        DateTime? dateTime = null;
+                        string[] row = rdr.Split("-");
+                        dateTime = DateTime.Parse(row[1].ToString());
+                        <span class="tag tag-success p-r-1 p-l-1 fs-11" title="تاریخ خوانده شدن">خوانده شده در @dateTime?.ToShamsiWithTime() </span>
+                    }
+                    else
+                    {
+                        <span class="tag tag-danger p-r-1 p-l-1 fs-11"> خوانده نشده </span>
+                    }
+                }
+
+            }
+        </div>
+        <div class="col-md-4 col-xs-12 text-xs-center">
+            @if (Model.Parent != null)
+            {
+
+                <span class="fs-12">@Model.Parent.Subject</span>
+                <span> | </span>
+                <span class="fs-10 text-white">پاسخ</span>
+
+
+            }
+            else
+            {
+                <span class="fs-12">@Model.Subject</span>
+                <span> | </span>
+                <span class="fs-10 text-white">اصلی</span>
+            }
+            
+        </div>
+        <div class="col-md-4 col-xs-12 text-md-left text-xs-center" id="div3">
+
+            @if (Model.SenderCode == User.Identity.Name)
+            {
+                @if (Model.Parent != null)
+                {
+                    <div class="btn-group btn-group-sm fs-11" role="group" aria-label="Basic example">
+                        @if (!readers.Any(a => a.Substring(0, a.IndexOf("-")) == "290070"))
+                        {
+                            <button type="button" class="btn btn-secondary btn-zRemove" data-id="@Model.Id" data-toggle="tooltip" title="حذف"><span class="fa fa-remove text-danger"></span></button>
+                            @*<button type="button" class="btn btn-secondary" data-id="@Model.Id" data-toggle="tooltip" title="ویرایش"><span class="fa fa-edit text-info"></span></button>*@
+                            <a href="/Admin/Conversations/Edit?id=@Model.Id" class="btn btn-secondary" data-toggle="tooltip" title="ویرایش"><span class="fa fa-edit text-info"></span></a>
+                        }
+                    </div>
+                }
+
+            }
+            else
+            {
+                if (User.Identity.Name == "290070")
+                {
+                    @if (Model.SenderCode != "290070")
+                    {
+                        @if (IsVis == true)
+                        {
+                            @if (Model.ParentId != null)
+                            {
+                                <a href="/Admin/Conversations/Create?pId=@Model.ParentId&&repId=@Model.Id" type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" title="افزودن جواب"><span class="fa fa-plus-circle text-success"></span></a>
+                            }
+
+                        }
+
+                    }
+
+                }
+
+
+
+
+
+            }
+
+
+            @if (IsVis == false)
+            {
+                @if (Model.SenderCode != User.Identity.Name)
+                {
+                    <a href="javascript:void(0)" class="fs-11 bg-primary white p-r-2 p-l-2 rounded WantToRead" data-id="@Model.Id">مشاهده پیام</a>
+                }
+            }
+
+
+
+        </div>
+
+    </header>
+    @{ 
+        string DivConvId = "mess" + Model.Id.ToString();
+    }
+    <div class="col-xs-12 @vis" id="@DivConvId">
+        @foreach (var item in Model.MessagesList)
+        {
+            <p>@item</p>
+        }
+    </div>
+    <footer class="col-xs-12 p-l-5">
+
+
+        <span class="float-xs-left fs-11 text-muted">@Model.SenderFullPro</span>
+
+    </footer>
+
+</div>
+@*<script src="~/AdminRef/app-assets/js/core/libraries/jquery.min.js" type="text/javascript"></script>*@

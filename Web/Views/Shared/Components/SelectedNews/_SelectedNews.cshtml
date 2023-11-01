@@ -1,0 +1,32 @@
+﻿@using Core.Services.Interfaces;
+@using Core.Convertors; 
+@inject INewsService _newsService
+@{ 
+    List<DataLayer.Entities.Blogs.News> news = await _newsService.GetNewsAsync();
+}
+<section class="why-us section-bg" data-aos="fade-up" date-aos-delay="200">
+    <div class="container">
+        
+        <div class="row">
+            <div class="d-flex flex-column justify-content-center p-5">
+                <h3 class="text-center">آخرین اخبار</h3>
+                @foreach (var item in news.OrderByDescending(r => r.News_Date).Take(4))
+                {
+                    <div class="icon-box">
+                        <div class="icon">
+                            <img src="~/images/blogs/@item.News_Image" alt="@item.News_Title" width="72" height="72" />
+                        </div>
+                        <h4 class="title"><a href="/News/d/@item.News_Code">@item.News_Title | @item.News_Date.ToShamsiWithTime()</a></h4>
+                        <p class="description fs-18 line-height-1">
+                            @item.News_Abstract
+                        </p>
+                    </div>
+                }
+                
+
+            </div>
+            
+        </div>
+
+    </div>
+</section>

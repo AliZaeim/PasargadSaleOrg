@@ -1,0 +1,318 @@
+﻿@model Core.DTOs.General.SOrgCommissionsReport
+@using Core.Services.Interfaces;
+@inject IBordroService _bordroService
+@inject IUserService _userService
+@{
+    ViewData["Title"] = "لیست کارمزد";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+}
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <h4 class="alert alert-danger text-xs-center">@Model.Message</h4>
+}
+@if (string.IsNullOrEmpty(Model.TextFileString))
+{
+    <script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+    <link href="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.min.css" rel="stylesheet" />
+    <script src="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.min.js"></script>
+
+    <h2 class="alert alert-info text-xs-center">لیست کارمزد</h2>
+
+    <div class="row" lang="fa">
+        <div class="offset-md-3 col-md-6 col-xs-12">
+            <form asp-action="CommissionsList">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Mounth" class="control-label"></label>
+                    <select asp-for="Mounth" class="form-control">
+                        <option value="">ماه گزارش را انتخاب کنید ...</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m">@m</option>
+                        }
+
+                    </select>
+                    <span asp-validation-for="Mounth" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Year" class="control-label"></label>
+                    <select asp-for="Year" class="form-control">
+                        <option value="">سال گزارش را انتخاب کنید ...</option>
+                        @for (int y = Model.StartYear; y <= Model.CurrentYear; y++)
+                        {
+                            <option value="@y">@y</option>
+                        }
+
+                    </select>
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="OrgUrIds" class="control-label"></label>
+                    <select asp-for="OrgUrIds" lang="fa" class="selectpicker  form-control border-black  mt-4  show-menu-arrow "
+                            data-live-search="true" data-actions-box="true"
+                            multiple title="انتخاب کنید ..." data-header="کاربر یا کاربران مورد نظر خود را انتخاب کنید"
+                            data-style="btn-light" data-selected-text-format="count > 1"
+                            data-dropdownAlignRight="true">
+                        @foreach (var item in Model.UserRoles.ToList())
+                        {
+
+                            <option class="@((item.IsActive == true && item.UserRoleParent?.IsActive == true) ? "black" : "warning")" value="@item.URId">
+                                @item.FullPro | @item.User.Code | @item.UserRoleParent?.FullPro |
+                                @if (item.IsActive == true && item.UserRoleParent?.IsActive == true)
+                                {
+                                    <text>فعال</text>
+                                }
+                                else
+                                {
+                                    <text>غیرفعال</text>
+                                }
+                            </option>
+
+
+                        }
+                    </select>
+                    <span asp-validation-for="OrgUrIds" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="form-group">
+                    <input type="submit" value="ارسال" class="btn btn-primary col-xs-12" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $('.selectpicker').selectpicker({
+            selectAllText: '<span class="text-success fs-18 border col-xs-12">هــمه</span>',
+            deselectAllText: '<span class="text-danger fs-18 border col-xs-12">هیــچکدام</span>',
+            showContent: "true",
+            liveSearchPlaceholder: "جستجوی کاربر ...",
+            container: "true",
+            countSelectedText: "{0} کاربر انتخاب شده",
+            showTick: "true",
+            tickIcon: "fa fa-check",
+            virtualScroll: "true",
+            noneResultsText: "<span class='text-danger'>کاربری یافت نشد !</span>"
+        });
+    </script>
+
+}
+else
+{
+
+
+
+    <div class="m-b-5">
+        <div class="col-md-2 fs-14 text-xs-right  p-1">
+            <span class="bg-primary p-1 text-white">کل رکوردها : @Model.TotalRec</span>
+        </div>
+        <div class="col-md-8 text-xs-center alert alert-info fs-24">
+            لیست کارمزد ماه @Model.Mounth سال @Model.Year
+        </div>
+        <div class="col-md-2 fs-14 text-xs-left p-1">
+            @{
+                int tPage = 0;
+                if (Model.TotalRec % Model.RecCount == 0)
+                {
+                    tPage = (int)Model.TotalRec / (int)Model.RecCount;
+                }
+                else
+                {
+                    tPage = ((int)Model.TotalRec / (int)Model.RecCount) + 1;
+                }
+            }
+            <span class="bg-primary p-1 text-white">کل صفحات : @tPage</span>
+        </div>
+    </div>
+    <div class="table-responsive">
+
+        <div class="form-group pr-0 pl-0">
+
+            <div class="col-md-8 col-xs-12 mb-1 form-group">
+                <form action="CommissionsList" method="post" class="form-inline ">
+                    <input type="hidden" asp-for="TextFileString" id="fs" />
+                    <input type="hidden" asp-for="Mounth" />
+                    <input type="hidden" asp-for="Year" />
+                    <input type="hidden" asp-for="ComListJsonString" />
+                    <input type="hidden" asp-for="OrgUserRolesJsonString" />
+                    <input class="col-md-4 col-xs-12 input-lg text-xs-center" asp-for="search" type="text" autofocus autocomplete="off" data-toggle="tooltip" data-placement="top" title="در نام کامل، سمت و کد سازمانی" placeholder="جستجو در لیست کارمزد">
+                    
+                    <div class="col-md-4 col-xs-12 mb-1 form-group">
+                        <input type="number" asp-for="RecCount" class="col-md-5 col-xs-6 text-xs-center" placeholder="تعداد" data-toggle="tooltip" data-placement="top" title="تعداد در صفحه" value="@Model.RecCount" />
+                        <input type="number" asp-for="CurPage" maxlength="5" class="offset-md-2 col-md-5 col-xs-6  text-xs-center" placeholder="برو به ؟" data-toggle="tooltip" data-placement="top" value="@Model.CurPage" title="انتقال به صفحه" />
+                    </div>
+                    <div class="col-md-4 col-xs-12 form-group">
+
+                        <input type="submit" value="تایید" class="col-xs-12" />
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-2 col-xs-12">
+                <form action="WriteComListExcelFile" method="post">
+
+                    <input type="hidden" name="ComListjsonString" asp-for="ComListJsonString" />
+
+                    <button type="submit" class="col-xs-12 btn-success" title="ثبت فایل اکسل"><span class="fa fa-file-excel-o fs-16 white"></span></button>
+                </form>
+            </div>
+
+
+            <button class="col-md-2 col-xs-12 btn-primary" id="btnSaveTextFile" title="ایجاد فایل کارمزد"><span class="fa fa-file-text fs-16 white"></span></button>
+
+        </div>
+        <table class="table table-bordered table-striped fs-13 sortable table-numberedRows" id="tblCom">
+            <thead>
+                <tr class="cursor-pointer">
+
+                    <th class="text-xs-center align-middle width-15-per p-0">نام و نام خانوادگی</th>
+                    <th class="text-xs-center align-middle p-0">سمت</th>
+                    <th class="text-xs-center align-middle p-0">کد سازمانی</th>
+                    <th class="text-xs-center align-middle p-0">شماره حساب</th>
+                    <th class="text-xs-center align-middle p-0">کارمزد شخصی</th>
+                    <th class="text-xs-center align-middle p-0">کارمزد سازمانی</th>
+                    <th class="text-xs-center align-middle p-0">پاداش همانند سازی</th>
+                    <th class="text-xs-center align-middle p-0">پاداش استخر</th>
+                    <th class="text-xs-center align-middle p-0">کسورات</th>
+
+                    <th class="text-xs-center align-middle p-0">جمع کل</th>
+
+                </tr>
+            </thead>
+            <tbody id="tbody">
+
+                @foreach (var item in Model.CommissionListModels)
+                {
+
+                    <tr>
+
+                        <td class="text-xs-center align-middle p-0">@item.FullName</td>
+                        <td class="text-xs-center align-middle p-0 fs-12">@item.Title</td>
+                        <td class="text-xs-center align-middle p-0">@item.Code</td>
+                        <td class="text-xs-center align-middle p-0">@item.BankAccount</td>
+                        <td class="text-xs-center align-middle p-0">@item.PersonalCommAll.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0">@item.OrgCommAll.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0">@item.EqRewAll.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0">@item.PoolRewAll.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0"></td>
+
+                        <td class="text-xs-center align-middle p-0">@item.RowCommSum.ToString("N0")</td>
+
+                    </tr>
+
+                }
+
+
+            </tbody>
+            <tfoot>
+                <tr class="bg-grey white">
+                    <td class="text-xs-center align-middle p-0" colspan="5">جــمع : </td>
+
+                    <td class="text-xs-center align-middle p-0">@Model.CommissionListModels.Sum(s => s.PersonalCommAll).ToString("N0")</td>
+                    <td class="text-xs-center align-middle p-0">@Model.CommissionListModels.Sum(s => s.OrgCommAll).ToString("N0")</td>
+                    <td class="text-xs-center align-middle p-0">@Model.CommissionListModels.Sum(s => s.EqRewAll).ToString("N0")</td>
+                    <td class="text-xs-center align-middle p-0">@Model.CommissionListModels.Sum(s => s.PoolRewAll).ToString("N0")</td>
+                    <td class="text-xs-center align-middle p-0">0</td>
+
+                    <td class="text-xs-center align-middle p-0">@Model.CommissionListModels.Sum(s => s.PersonalCommAll + s.OrgCommAll + s.EqRewAll + s.PoolRewAll).ToString("N0")</td>
+                </tr>
+                @if (Model.CommissionListModels.Count != Model.TotalRec)
+                {
+                    <tr class="bg-success white">
+                        <td class="text-xs-center align-middle p-0" colspan="5">جــمع کل : </td>
+
+                        <td class="text-xs-center align-middle p-0">@Model.AllTotalPersonalCom.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0">@Model.AllTotalOrgCom.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0">@Model.AllTotalEqRew.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0">@Model.AllTotalPoolRew.ToString("N0")</td>
+                        <td class="text-xs-center align-middle p-0">0</td>
+
+                        <td class="text-xs-center align-middle p-0">
+
+                            @{
+
+                                long AllTotal = Model.AllTotalPersonalCom + Model.AllTotalOrgCom + Model.AllTotalEqRew + Model.AllTotalPoolRew;
+
+                            }
+                            @AllTotal.ToString("N0")
+                        </td>
+                    </tr>
+                }
+
+            </tfoot>
+
+        </table>
+    </div>
+    <input type="hidden" asp-for="search" id="srch" />
+
+}
+@section Scripts{
+    <script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/sorttable.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var term = $("#srch").val();
+            if (term !== "") {
+                var $context = $("table tbody tr");
+                $(".pm").remove();
+                $context.show().unmark();
+                if (term) {
+                    $context.mark(term, {
+                        "className": "bg-warning",
+                        "separateWordSearch": false,
+                        "accuracy": "exactly",
+                        "noMatch": function () {
+                            $("#div3").append("<p class='col-xs-12 fs-18 text-xs-center pm red m-t-5'>موردی یافت نشد</p>");
+                        },
+                        done: function (counter) {
+                            if (counter !== 0) {
+                                $("#div3").append("<p class='col-xs-12 fs-18 text-xs-center pm red m-t-5'>" + counter + " " + "مورد" + " " + term + " " + "یافت شد !" + "</p>");
+                            }
+
+                            $context.not(":has(mark)").hide();
+
+                        }
+
+                    });
+                }
+            }
+            
+
+            $("tbody td").on("mouseover", function () {
+                var row_index = $(this).parent().index();
+                var col_index = $(this).index();
+                $(this).prop("title", row_index + 1);
+            });
+            //$("#search").keypress(function (e) {
+
+
+            //});
+            $("#btnSaveTextFile").click(function () {
+
+                var dd = $("#fs").val();
+
+
+                $.ajax({
+                    url: "/Admin/BordroReports/Createtxt",
+                    data: { StrData: dd },
+                    type: "POST",
+                    success: function (result) {
+                        alert(result);
+
+                    },
+                    error: function () {
+                        alert("خطا رخ داده است");
+                    }
+                });
+            });
+        });
+    </script>
+}

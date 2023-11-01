@@ -1,0 +1,158 @@
+﻿@model Core.DTOs.Admin.RegisterUserViewModel
+@using System.Globalization;
+@{
+    ViewData["Title"] = "ثبت نام در سایت بیمه پاسارگاد";
+    Layout = "~/Views/Shared/_AcLayout.cshtml";
+    PersianCalendar pc = new PersianCalendar();
+    int sYear = pc.GetYear(DateTime.Now) - 18;
+    int eYear = pc.GetYear(DateTime.Now) - 70;
+}
+<div class="row" dir="rtl">
+    <div class="offset-md-4 col-md-4 col-xs-12">
+        <h2 class="text-xs-center alert alert-info">ثبت نام کاربر</h2>
+        <form asp-action="Register" class="p-1">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="UserFirstName" class="form-control" placeholder="نــام">
+
+                <span asp-validation-for="UserFirstName" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <input asp-for="UserFamiy" class="form-control" placeholder="نام خانوادگی">
+                <span asp-validation-for="UserFamiy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <select asp-for="BDateYear" class="form-control">
+                        <option value="">سال تولد</option>
+                        @for (int y = eYear; y <= sYear; y++)
+                        {
+                            <option value="@y">@y</option>
+                        }
+                    </select>
+                    <select asp-for="BDateMounth" class="form-control">
+                        <option value="">ماه تولد</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m">@m</option>
+                        }
+                    </select>
+                    <select asp-for="BDateDay" class="form-control">
+                        <option value="">روز تولد</option>
+                        @for (int d = 1; d <= 31; d++)
+                        {
+                            <option value="@d">@d</option>
+                        }
+                    </select>
+
+
+                </div>
+                <span asp-validation-for="BDateYear" class="text-danger col-xs-12"></span>
+                <span asp-validation-for="BDateMounth" class="text-danger col-xs-12"></span>
+                <span asp-validation-for="BDateDay" class="text-danger col-xs-12"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="UserNC" class="form-control" placeholder="کــد ملی">
+                <span asp-validation-for="UserNC" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="UserCellphone" class="form-control" placeholder="تلفن همراه">
+                <span asp-validation-for="UserCellphone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <select asp-for="StateId" class="form-control form-control-lg" id="state">
+                    <option value="">استان را انتخاب کنید...</option>
+                    @foreach (var state in Model.States)
+                    {
+                        if (Model.StateId == state.StateId)
+                        {
+                            <option selected value="@state.StateId">@state.StateName</option>
+                        }
+                        else
+                        {
+                            <option value="@state.StateId">@state.StateName</option>
+                        }
+
+                    }
+                </select>
+                <span asp-validation-for="StateId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <select asp-for="CountyId" class="form-control form-control-lg" id="county">
+                    <option value="">شهرستان را انتخاب کنید ...</option>
+                    @if (Model.Counties != null)
+                    {
+                        if (Model.Counties.Count() != 0)
+                        {
+                            foreach (var county in Model.Counties)
+                            {
+                                if (Model.CountyId == county.CountyId)
+                                {
+                                    <option selected value="@county.CountyId">@county.CountyName</option>
+                                }
+                                else
+                                {
+                                    <option value="@county.CountyId">@county.CountyName</option>
+                                }
+                            }
+                        }
+                    }
+
+                </select>
+                <span asp-validation-for="CountyId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <select asp-for="RoleId" class="form-control form-control-lg" id="county">
+                    <option value="">نقش را انتخاب کنید ...</option>
+                    @if (Model.Roles != null)
+                    {
+                        if (Model.Roles.Count() != 0)
+                        {
+                            foreach (var role in Model.Roles)
+                            {
+                                if (Model.RoleId == role.RoleId)
+                                {
+                                    <option selected value="@role.RoleId">@role.RoleTitle</option>
+                                }
+                                else
+                                {
+                                    <option value="@role.RoleId">@role.RoleTitle</option>
+                                }
+                            }
+                        }
+                    }
+
+                </select>
+                <span asp-validation-for="RoleId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="OrgCode" class="form-control" placeholder="کــد سازمانی نقش">
+                <span asp-validation-for="OrgCode" class="text-danger"></span>
+            </div>
+            <div class="form-group ">
+                <input type="submit" value="ثبت نام" class="btn btn-primary col-xs-12" />
+
+            </div>
+
+        </form>
+    </div>
+</div>
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#state").change(function () {
+            var sval = $(this).val();
+            $.ajax({
+                url: "/Account/ListCountiesofState",
+                data: { stateId: sval },
+                type: "GET"
+            }).done(function (result) {
+                $("#county").html(result);
+            });
+
+        });
+    });
+</script>

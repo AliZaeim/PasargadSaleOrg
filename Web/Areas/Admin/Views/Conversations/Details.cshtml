@@ -1,0 +1,292 @@
+﻿@model DataLayer.Entities.ComplementaryInfo.Conversation
+@using Core.Services.Interfaces;
+@inject IComplementaryService _compService
+@using Core.Convertors;
+@{
+    ViewData["Title"] = "جزئیات پیام" + " " + Model.Subject;
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    List<DataLayer.Entities.ComplementaryInfo.Conversation> chConversations = null;
+    if (Model.ParentId == null)
+    {
+        chConversations = await _compService.GetConversationsByParentIdAsync((int)Model.Id);
+        if (User.Identity.Name != "290070")
+        {
+            chConversations = chConversations.Where(w => w.SenderCode == User.Identity.Name || w.SenderCode == "290070").ToList();
+        }
+    }
+    int? idd = null;
+    if (ViewData["id"] != null)
+    {
+        idd = int.Parse(ViewData["id"].ToString());
+    }
+}
+
+@if (Model != null)
+{
+    <input type="hidden" value="@idd" id="ConvId" />
+    <div class="row border rounded">
+        <header class="col-xs-12  bg-white border-bottom">
+            <div class="col-md-3 col-xs-12 text-md-right text-xs-center">
+                <span class="text-muted fs-11">@Model.CreateDate.ToShamsiWithTime()</span>
+                @{
+                    List<string> readers = Model.ReadersList.ToList();
+                    readers = readers.Where(w => !string.IsNullOrEmpty(w)).ToList();
+                    List<string> receps = Model.RecepiesList.ToList();
+                    receps = receps.Where(w => !string.IsNullOrEmpty(w)).ToList();
+                }
+
+                @if (Model.SenderCode == User.Identity.Name)
+                {
+                    <span class="text-muted"> | </span>
+                    @if (Model.SenderCode == "290070")
+                    {
+                        <span class="tag tag-success fs-11 tag-pill">@readers.Count()</span>
+                        <span class="fs-11"> نفر از </span>
+                        <span class="tag tag-info fs-11 tag-pill">@receps.Count()</span>
+                        <span class="fs-11"> نفر خوانده</span>
+                    }
+
+                }
+            </div>
+            <div class="col-md-6 col-xs-12 text-xs-center">
+                @if (Model.Parent != null)
+                {
+
+                    <span class="text-muted fs-11">@Model.Parent.Subject</span>
+
+                }
+                else
+                {
+                    <span class="text-muted fs-11">@Model.Subject</span>
+                }
+            </div>
+            <div class="col-md-3 col-xs-12 text-md-left text-xs-center">
+                @if (Model.SenderCode == User.Identity.Name)
+                {
+                    @if (chConversations == null)
+                    {
+                        <span class="text-muted fa fa-remove" title="حذف"></span>
+                        <span class="text-muted fa fa-edit" title="ویرایش"></span>
+                    }
+
+                }
+
+            </div>
+        </header>
+        <div class="col-xs-12">
+            @foreach (var item in Model.MessagesList)
+            {
+                <p>@item</p>
+            }
+        </div>
+        <footer class="col-xs-12 p-l-5">
+
+
+            <span class="float-xs-left fs-11 text-muted">@Model.SenderFullPro</span>
+
+        </footer>
+
+    </div>
+    <h5 class="col-xs-12 alert alert-info text-xs-center p-0 m-t-5">پاسخها</h5>
+    <div class="col-xs-12 border rounded p-0 m-t-5">
+
+        @foreach (var rep in chConversations.OrderBy(r => r.CreateDate))
+        {
+
+            <div class="col-xs-12 p-0 border m-t-5">
+                <header class="col-xs-12  bg-white w-100 rounded border-bottom">
+                    <div class="col-md-3 col-xs-12 text-md-right text-xs-center">
+                        <span class="text-muted fs-11">@rep.CreateDate.ToShamsiWithTime()</span>
+
+
+
+
+                        <span class="text-muted"> | </span>
+                        @{
+                            List<string> Repreaders = null;
+                            if (!string.IsNullOrEmpty(rep.Readers))
+                            {
+                                Repreaders = rep.ReadersList.ToList();
+                            }
+                            List<string> Rep_receps = null;
+                            if (!string.IsNullOrEmpty(rep.RecepiesInfo))
+                            {
+                                Rep_receps = rep.RecepiesList.ToList(); ;
+                            }
+                            bool IsinReceps = false;
+                            bool IsinReaders = false;
+                            if (Rep_receps != null)
+                            {
+                                if (Rep_receps.Any(a => a.Substring(0, a.IndexOf("-")) == User.Identity.Name))
+                                {
+                                    IsinReceps = true;
+                                }
+                            }
+                            if (Repreaders != null)
+                            {
+                                if (Repreaders.Any(a => a.Substring(0, a.IndexOf("-")) == User.Identity.Name))
+                                {
+                                    IsinReaders = true;
+                                }
+                            }
+
+                            string tit = "مشاهده";
+                            string ShowSt = string.Empty;
+                        }
+                        @if (idd == rep.Id)
+                        {
+                            tit = "مخفی";
+                        }
+                        @if (rep.SenderCode != User.Identity.Name)
+                        {
+                            if (IsinReceps && !IsinReaders)
+                            {
+                                ShowSt = "hidden";
+                                <span data-show-id="@rep.Id" class="cursor-pointer fa fa-eye Zshow" title="@tit"></span>
+                            }
+
+
+                        }
+
+
+
+
+                    </div>
+                    <div class="col-md-6 col-xs-12 text-xs-center">
+                        @if (rep.Parent != null)
+                        {
+
+                            <span class="text-muted fs-11">@rep.Parent.Subject</span>
+
+                        }
+                        else
+                        {
+                            <span class="text-muted fs-11">@rep.Subject</span>
+                        }
+                    </div>
+                    <div class="col-md-3 col-xs-12 text-md-left text-xs-center">
+                        @if (rep.SenderCode == User.Identity.Name)
+                        {
+
+                            <span class="text-muted fs-11 fa fa-remove" title="حذف"></span>
+                            <span class="text-muted fs-11 fa fa-edit" title="ویرایش"></span>
+
+
+                        }
+                        @if (User.Identity.Name == "290070")
+                        {
+                            <span>&ensp;</span>
+                            <a href="/Admin/Conversations/Create?parentId=@rep.Id">
+                                <span class="text-success fs-11 fa fa-plus-circle" title="افزودن جواب"></span>
+                            </a>
+
+                        }
+
+
+                    </div>
+                </header>
+                @if (rep.SenderCode != User.Identity.Name)
+                {
+                    @if (IsinReceps)
+                    {
+                        <div class="col-xs-12 p-t-5 @ShowSt" id="@rep.Id">
+                            @foreach (var itemRep in rep.MessagesList)
+                            {
+                                <p>@itemRep</p>
+
+                            }
+
+                        </div>
+
+                    }
+
+                }
+                else
+                {
+                    <div class="col-xs-12 p-t-5">
+                        @foreach (var itemRep in rep.MessagesList)
+                        {
+                            <p>@itemRep</p>
+                        }
+
+                    </div>
+                }
+
+                <footer class="mt-3 p-l-5">
+                    <span class="float-xs-left fs-11 text-muted">@rep.SenderFullPro</span>
+                </footer>
+            </div>
+
+            var ch2Conversations = await _compService.GetConversationsByParentIdAsync(rep.Id);
+
+            @foreach (var reprep in ch2Conversations)
+            {
+                <div>
+                    <header>@reprep.CreateDate.ToShamsiWithTime()</header>
+                    @reprep.Message
+                </div>
+            }
+
+        }
+    </div>
+    <a href="/Admin/Conversations/Create?parentId=@Model.Id" class="btn btn-success float-xs-left m-t-10">ثبت پاسخ</a>
+}
+else
+{
+    <h2 class="text-xs-center alert alert-danger">پیامی یافت نشد !</h2>
+}
+@section Scripts{
+
+
+    <script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/sorttable.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var convId = $("#ConvId").val();
+            $("#" + convId).removeClass('hidden');
+
+            $.ajax({
+                url: "/Admin/Conversations/AddReaderToConv",
+                data: { id: convId },
+                success: function (result) {
+                    //alert(result);
+                },
+                error: function () {
+                    alert('error');
+                }
+            });
+            $("#" + convId).siblings("header").find(".Zshow").toggleClass("fa-eye fa-eye-slash");
+
+            $(".Zshow").click(function () {
+
+                $(this).attr('title', $(this).attr('title') === 'مشاهده' ? 'مخفی' : 'مشاهده');
+                var thid = $(this).attr("data-show-id");
+                var idd = "#" + $(this).attr("data-show-id");
+                if ($(this).hasClass("fa-eye-slash")) {
+                    $(idd).toggleClass('hidden shown', 1000);
+                }
+                if ($(this).hasClass("fa-eye")) {
+                    $(idd).toggleClass('hidden shown', 1000);
+                }
+                $(this).toggleClass("fa-eye fa-eye-slash");
+
+
+                $.ajax({
+                    url: "/Admin/Conversations/AddReaderToConv",
+                    data: { id: thid },
+                    success: function (result) {
+                        //alert(result);
+                    },
+                    error: function () {
+                        alert('error');
+                    }
+                });
+
+
+            });
+
+        });
+    </script>
+}

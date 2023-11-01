@@ -1,0 +1,208 @@
+﻿@model Core.DTOs.Admin.UserUpdateVM
+
+@{
+    ViewData["Title"] = "ویرایش اطلاعات کاربر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">ویرایش اطلاعات کاربر</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="EditUser">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="col-md-4 col-xs-12 form-group">
+                <div class="form-group">
+                    <label asp-for="FName" class="control-label"></label>
+                    <input asp-for="FName" class="form-control" />
+                    <span asp-validation-for="FName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LName" class="control-label"></label>
+                    <input asp-for="LName" class="form-control" />
+                    <span asp-validation-for="LName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NC" class="control-label"></label>
+                    <input asp-for="NC" class="form-control" />
+                    <span asp-validation-for="NC" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FatherName" class="control-label"></label>
+                    <input asp-for="FatherName" class="form-control" />
+                    <span asp-validation-for="FatherName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Cellphone" class="control-label"></label>
+                    <input asp-for="Cellphone" class="form-control" />
+                    <span asp-validation-for="Cellphone" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Phone" class="control-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="BankAccountNumber" class="control-label"></label>
+                    <input asp-for="BankAccountNumber" class="form-control" />
+                    <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+                </div>
+                
+            </div>
+            <div class="col-md-4 col-xs-12 form-group">
+                <div class="form-group">
+                    <div class="input-group ">
+                        <label asp-for="StateId" class="control-label"></label>
+                        <select asp-for="StateId" class="form-control " id="state">
+                            <option value="">استان خود را انتخاب کنید...</option>
+                            @foreach (var state in Model.States)
+                            {
+                                if (Model.StateId == state.StateId)
+                                {
+                                    <option selected value="@state.StateId">@state.StateName</option>
+                                }
+                                else
+                                {
+                                    <option value="@state.StateId">@state.StateName</option>
+                                }
+
+                            }
+                        </select>
+
+                    </div>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="input-group ">
+                        <label asp-for="CountyId" class="control-label"></label>
+                        <select asp-for="CountyId" class="form-control " id="county">
+                            <option value="">شهرستان خود را انتخاب کنید ...</option>
+                            @if (Model.Counties != null)
+                            {
+                                if (Model.Counties.Count() != 0)
+                                {
+                                    foreach (var county in Model.Counties)
+                                    {
+                                        if (Model.CountyId == county.CountyId)
+                                        {
+                                            <option selected value="@county.CountyId">@county.CountyName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@county.CountyId">@county.CountyName</option>
+                                        }
+                                    }
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+                    <span asp-validation-for="CountyId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="HomeAddress" class="control-label"></label>
+                    <input asp-for="HomeAddress" class="form-control" />
+                    <span asp-validation-for="HomeAddress" class="text-danger"></span>
+
+                </div>
+                <div class="form-group">
+                    <label asp-for="WorkAddress" class="control-label"></label>
+                    <input asp-for="WorkAddress" class="form-control" />
+                    <span asp-validation-for="WorkAddress" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="HomePostalCode" class="control-label"></label>
+                    <input asp-for="HomePostalCode" class="form-control" />
+                    <span asp-validation-for="HomePostalCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="WorkPostalCode" class="control-label"></label>
+                    <input asp-for="WorkPostalCode" class="form-control" />
+                    <span asp-validation-for="WorkPostalCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="BankCardNumber" class="control-label"></label>
+                    <input asp-for="BankCardNumber" class="form-control" />
+                    <span asp-validation-for="BankCardNumber" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-12 form-group">
+                <div class="form-group">
+                    <div class="input-group ">
+                        <label asp-for="Education" class="control-label"></label>
+                        <select asp-for="Education" class="form-control">
+                            <option value="">تحصیلات خود را انتخاب کنید</option>
+                            <option value="زیردیپلم">زیردیپلم</option>
+                            <option value="دیپلم">دیپلم</option>
+                            <option value="فوق دیپلم">فوق دیپلم</option>
+                            <option value="لیسانس">لیسانس</option>
+                            <option value="فوق لیسانس">فوق لیسانس</option>
+                            <option value="دکترا">دکترا</option>
+                        </select>
+
+                    </div>
+                    <span asp-validation-for="Education" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="InitialStatic" class="control-label"></label>
+                    <input asp-for="InitialStatic" class="form-control" />
+                    <span asp-validation-for="InitialStatic" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="InitialPortfo" class="control-label"></label>
+                    <input asp-for="InitialPortfo" class="form-control" />
+                    <span asp-validation-for="InitialPortfo" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PasargadOrgCode" class="control-label"></label>
+                    <input asp-for="PasargadOrgCode" class="form-control" />
+                    <span asp-validation-for="PasargadOrgCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SponserCode" class="control-label"></label>
+                    <input asp-for="SponserCode" class="form-control" />
+                    <span asp-validation-for="SponserCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SponserBranch" class="control-label"></label>
+                    <input asp-for="SponserBranch" class="form-control" />
+                    <span asp-validation-for="SponserBranch" class="text-danger"></span>
+                </div>
+            </div>  
+            <div class="form-group row">
+                <input type="submit" value="ویرایش" class="btn btn-primary offset-md-4 col-md-4 col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="UsersWithRole">بازگشت</a>
+</div>
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#state").change(function () {
+            var sval = $(this).val();
+            $.ajax({
+                url: "/Admin/AdminUsers/ListCountiesofState",
+                data: { stateId: sval },
+                type: "GET"
+            }).done(function (result) {
+                $("#county").html(result);
+            });
+
+        });
+        
+    });
+</script>

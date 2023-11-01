@@ -1,0 +1,31 @@
+﻿@model Core.DTOs.Account.ConfirmCellphoneViewModel
+
+@{
+    ViewData["Title"] = "تایید تلفن همراه";
+    Layout = "~/Views/Shared/_AcLayout.cshtml";
+}
+<div class="row">
+    <div class="container pt-2">
+        <h2 class="text-xs-center alert alert-info">کد ارسال شده به تلفن همراه تان را وارد کنید</h2>
+        <form asp-action="ConfirmCellphone" class="p-2">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="NC" />
+            <div class="form-group">
+                <label asp-for="ConfirmCode" class="control-label"></label>
+                <input asp-for="ConfirmCode" class="form-control" />
+                <span asp-validation-for="ConfirmCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ارسال" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+        <a href="/Login" class="col-xs-12 text-xs-center btn btn-outline-success mt-2"
+           id="btnLog">
+            قبلا ثبت نام کرده ام !
+        </a>
+        <a href="/" class="col-xs-12 text-xs-center btn btn-outline-info mt-2 mbmm-5">
+            صفحه اصلی
+        </a>
+    </div>
+    
+</div>

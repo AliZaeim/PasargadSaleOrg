@@ -1,0 +1,82 @@
+﻿@model IEnumerable<DataLayer.Entities.ComplementaryInfo.Slider>
+@using Core.Services.Interfaces;
+@using DataLayer.Entities.ComplementaryInfo;
+@using Core.Convertors;
+@inject IUserService userService
+@{
+    ViewData["Title"] = "اسلایدرها";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">اسلایدرها</h2>
+@if (userService.CheckPermissionByNameAsync(93, User.Identity.Name))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success">اسلاید جدید</a>
+    </p>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.LinkText)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Linkaddress)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </th>
+
+            <th class="text-xs-center align-middle"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @foreach (var t in item.TextList)
+                    {
+                        <p>@t</p>
+                    }
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.LinkText)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Linkaddress)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @item.CreateDate.ToShamsiN_WithTime()
+
+                <td class="text-xs-center align-middle">
+                    @if (userService.CheckPermissionByNameAsync(94, User.Identity.Name))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">ویرایش</a> <span>|</span>
+                    }
+                    @if (userService.CheckPermissionByNameAsync(95, User.Identity.Name))
+                    {
+                        <a asp-action="Details" asp-route-id="@item.Id">جزئیات</a> <span>|</span>
+                    }
+                    @if (userService.CheckPermissionByNameAsync(96, User.Identity.Name))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id">حــذف</a>
+                    }
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,134 @@
+﻿@model Core.DTOs.Admin.ConversationVM
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@{
+    ViewData["Title"] = "ویرایش پیام";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    if(Model.Users !=null)
+    {
+        Model.Users = Model.Users.Where(w => w.Code != User.Identity.Name).ToList();
+    }
+
+
+}
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+<link href="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.min.css" rel="stylesheet" />
+<script src="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.min.js"></script>
+
+<h2 class="text-xs-center alert alert-info">ویرایش پیام</h2>
+
+
+<div class="row">
+    <div class="offset-md-4 col-md-4 col-xs-12">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            @if (Model.ParentId == null)
+            {
+                <div class="form-group">
+                    <label asp-for="Subject" class="control-label"></label>
+                    <input asp-for="Subject" class="form-control" />
+                    <span asp-validation-for="Subject" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="ParentId" />
+                <input type="hidden" asp-for="Subject" />
+            }
+
+            <div class="form-group">
+                <label asp-for="Message" class="control-label"></label>
+                <textarea asp-for="Message" rows="10" class="form-control"></textarea>
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+            @if (User.Identity.Name == "290070")
+            {
+                @if (Model.Users.Count() != 0)
+                {
+                    <div class="form-group">
+                        <label asp-for="UserInfos" class="control-label"></label>
+
+                        <select asp-for="UserInfos" lang="fa" class="selectpicker  form-control border-black  mt-4  show-menu-arrow "
+                                data-live-search="true" data-actions-box="true"
+                                multiple title="انتخاب کنید ..." data-header="کاربر یا کاربران مورد نظر خود را انتخاب کنید"
+                                data-style="btn-light" data-selected-text-format="count > 1"
+                                data-dropdownAlignRight="true">
+                            @foreach (var item in Model.Users)
+                            {
+                                List<DataLayer.Entities.User.UserRole> userRoles = await _userService.GetUserRolesByUserCode(item.Code);
+                                DataLayer.Entities.User.UserRole ActiveUserRole = userRoles.FirstOrDefault(f => f.IsActive);
+                                if (Model.SelectedRecepsCode.Any(a => a == item.Code))
+                                {
+                                    <option selected value="@item.Code-@ActiveUserRole.FullPro">
+                                        @item.Code-@ActiveUserRole.FullPro
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Code-@ActiveUserRole.FullPro">
+                                        @item.Code-@ActiveUserRole.FullPro
+                                    </option>
+                                }
+
+
+                            }
+                        </select>
+                        <span asp-validation-for="UserInfos" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <select asp-for="UserInfos" hidden>
+                        @foreach (var item in Model.UserInfos)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+
+                    <span asp-validation-for="UserInfos" class="text-danger"></span>
+                }
+
+
+            }
+            else
+            {
+
+                <input type="hidden" asp-for="UserInfos" value="290070-بیمه پاسارگاد" />
+                <span asp-validation-for="UserInfos" class="text-danger"></span>
+            }
+
+
+            <div class="form-group">
+                <input type="submit" value="ویرایش" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.ParentId != null)
+{
+    <a href="/Admin/Conversations/ShowConv/@Model.ParentId">بازگشت</a>
+}
+else
+{
+    <div>
+        <a asp-action="Index">بازگشت</a>
+    </div>
+}
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    $('.selectpicker').selectpicker({
+        selectAllText: '<span class="text-success fs-18 border col-xs-12">هــمه</span>',
+        deselectAllText: '<span class="text-danger fs-18 border col-xs-12">هیــچکدام</span>',
+        showContent: "true",
+        liveSearchPlaceholder: "جستجوی کاربر ...",
+        container: "true",
+        countSelectedText: "{0} کاربر انتخاب شده",
+        showTick: "true",
+        tickIcon: "fa fa-check",
+        virtualScroll: "true",
+        noneResultsText: "<span class='text-danger'>کاربری یافت نشد !</span>"
+    });
+</script>

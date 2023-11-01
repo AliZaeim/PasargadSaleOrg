@@ -1,0 +1,23 @@
+﻿@model Core.DTOs.General.ShowChilderensVM
+@using Core.Services.Interfaces;
+@using DataLayer.Entities.User;
+@inject IUserService _userService;
+@{
+    ViewData["Title"] = "نمودار سازمانی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    
+}
+
+
+<div>
+    @if (Model != null)
+    {
+        @await Component.InvokeAsync("Childerens", Model)
+    }
+    else
+    {
+        <h3 class="text-xs-center">اطلاعات مربوط به این کاربر قابل نمایش نیست !</h3>
+    }
+
+</div>
+

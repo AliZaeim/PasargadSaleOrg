@@ -1,0 +1,86 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>60437da3-1db1-418b-8740-bf1f7999af3c</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="ViewComponents\Slider.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\bar-stacked.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\bar-stacked.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\bar.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\bar.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\column-stacked.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\column-stacked.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\column.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\bar\column.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\line\line-area.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\line\line-area.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\line\line-stacked-area.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\line\line-stacked-area.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\line\line.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\line\line.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\doughnut-simple.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\doughnut-simple.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\doughnut.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\doughnut.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\pie-simple.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\pie-simple.min.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\pie.js" />
+    <None Include="wwwroot\AdminRef\app-assets\js\scripts\charts\chartjs\pie-doughnut\pie.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
+    <PackageReference Include="ChartJSCore" Version="1.5.8" />
+    <PackageReference Include="ElmahCore" Version="1.2.5" />
+    <PackageReference Include="ElmahCore.Sql" Version="1.2.5" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.9" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NPOI" Version="2.5.1" />
+    <PackageReference Include="Stimulsoft.Reports.Web.NetCore" Version="2019.2.3" />
+    <PackageReference Include="WebMarkupMin.AspNetCore3" Version="2.8.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\DataLayer\DataLayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\blogs\thumb\" />
+    <Folder Include="wwwroot\images\usersavatar\" />
+    <Folder Include="wwwroot\images\users\" />
+    <Folder Include="wwwroot\txtFiles\" />
+    <Folder Include="wwwroot\Reports\" />
+    <Folder Include="wwwroot\upload\bordro\" />
+    <Folder Include="wwwroot\upload\commission\" />
+    <Folder Include="wwwroot\upload\addition\" />
+    <Folder Include="wwwroot\upload\insuredInfo\" />
+  </ItemGroup>
+
+</Project>

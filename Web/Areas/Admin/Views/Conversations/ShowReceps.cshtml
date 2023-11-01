@@ -1,0 +1,53 @@
+﻿@model DataLayer.Entities.ComplementaryInfo.Conversation
+
+@{
+    ViewData["Title"] = "دریافت کنندگان پیام" + " " + Model.Subject;
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    List<string> receps = null;
+    @if (!string.IsNullOrEmpty(Model.RecepiesInfo))
+    {
+        receps = Model.RecepiesList.ToList();
+    }
+
+
+}
+
+<h2 class="text-xs-center alert alert-info">
+    دریافت کنندگان پیام @Model.Subject | فرستنده پیام : @Model.SenderFullPro
+</h2>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                کــد
+            </th>
+            <th class="text-xs-center align-middle">
+                نام کامل
+            </th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in receps)
+        {
+            string[] sec = item.Split("-");
+
+            <tr>
+                <td class="text-xs-center align-middle">
+                    @sec[0].ToString()
+                </td>
+                <td class="text-xs-center align-middle">
+                    @sec[1].ToString()
+                </td>
+
+
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a asp-action="Index">بازگشت</a>
+</div>

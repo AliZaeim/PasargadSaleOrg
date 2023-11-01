@@ -1,0 +1,124 @@
+﻿@model IEnumerable<DataLayer.Entities.User.Role>
+@using Core.Services.Interfaces;
+@inject IUserService _UserService
+
+@{
+    ViewData["Title"] = "نقشها";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="alert alert-info text-xs-center">لیست نقشها</h1>
+<p>
+    @if (_UserService.CheckPermissionByNameAsync(58, User.Identity.Name))
+    {
+        <a asp-action="Create" asp-controller="Roles" asp-area="Admin" class="btn btn-outline-success">نقش جدید</a>
+    }
+    @if (_UserService.CheckPermissionByNameAsync(61, User.Identity.Name))
+    {
+        <a asp-action="PermissionsIndex" asp-controller="Roles" asp-area="Admin" class="btn btn-outline-info">لیست دسترسی ها</a>
+    }
+
+
+
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.RoleName)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.RoleTitle)
+            </th>
+            <th class="text-xs-center align-middle">
+                تعداد کاربران
+            </th>
+            <th class="text-xs-center align-middle">عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr id="@item.RoleId">
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.RoleName)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.RoleTitle)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @_UserService.GetUsers_of_RoleAsync(item.RoleId).Result.Count
+
+
+                    <a href="/Admin/Roles/UsersofRole?roleId=@item.RoleId" target="_blank" title="مشاهده">
+                        &ensp;
+                        <span class="fa fa-eye"></span>
+                    </a>
+
+
+
+                </td>
+                <td class="text-xs-center align-middle">
+                    @if (_UserService.CheckPermissionByNameAsync(59, User.Identity.Name))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.RoleId">ویرایش</a>
+                    }
+
+
+                    @if (_UserService.GetUsers_of_RoleAsync(item.RoleId).Result.Count() == 0)
+                    {
+                        @if (_UserService.CheckPermissionByNameAsync(60, User.Identity.Name))
+                        {
+                            <span> | </span>
+                            <span data-id="@item.RoleId" class="RemoveRole cursor-pointer text-danger">حــذف</span>
+                        }
+
+                    }
+
+
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts{
+    <script type="text/javascript">
+        $(".RemoveRole").click(function () {
+            Swal.fire({
+                title: 'آیا مطمئن به حــذف هستید؟',
+                //text: "You won't be able to revert this!",
+                type: 'warning',
+                showCancelButton: true,
+
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'بله، حذف شود!',
+                cancelButtonText: 'نه !',
+            }).then((result) => {
+
+                if (result.value) {
+                    var rid = $(this).attr("data-id");
+                    $.ajax({
+                        url: "/Admin/Roles/DeleteRole",
+                        data: { id: rid },
+                        type: "GET",
+                        success: function () {
+                            Swal.fire(
+                                'حــذف!',
+                                'نقش مورد نظر حذف شد !',
+                                'success'
+                            );
+                            $("#" + rid).remove();
+                        }
+                    });
+
+                }
+            });
+
+
+        });
+    </script>
+}

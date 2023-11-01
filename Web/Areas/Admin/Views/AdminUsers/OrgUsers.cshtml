@@ -1,0 +1,16 @@
+﻿@using Core.Services.Interfaces;
+@using DataLayer.Entities.User;
+@inject IUserService _userService;
+@{
+    ViewData["Title"] = "نمودار سازمانی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    List<UserRole> userRoles = await _userService.GetUserRolesByUserCode(User.Identity.Name);
+    UserRole ActiveUserRole = userRoles.FirstOrDefault(w => w.IsActive == true);
+}
+
+
+    <div>
+        @await Component.InvokeAsync("ChildUsers", ActiveUserRole.URId)
+    </div>
+
+

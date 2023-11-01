@@ -1,0 +1,43 @@
+﻿@model DataLayer.Entities.Blogs.NewsGroup
+
+@{
+    ViewData["Title"] = "ثبت گروه خبر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="text-xs-center alert alert-info">
+    ثبت گروه خبر
+    <a asp-action="Index" class="float-xs-left btn btn-warning">بازگشت</a>
+</h1>
+<hr />
+<div class="row">
+    <div class="col-xs-12 offset-md-4 col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="NewsGroup_Title" class="control-label"></label>
+                <input asp-for="NewsGroup_Title" class="form-control" />
+                <span asp-validation-for="NewsGroup_Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NewsgGroup_Comment" class="control-label"></label>
+                <input asp-for="NewsgGroup_Comment" class="form-control" />
+                <span asp-validation-for="NewsgGroup_Comment" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="ثبت" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/AdminRef/app-assets/js/jquery-1.12.4.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+
+   
+}
+

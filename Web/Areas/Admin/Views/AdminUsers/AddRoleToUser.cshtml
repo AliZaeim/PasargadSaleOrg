@@ -1,0 +1,52 @@
+﻿@model Core.DTOs.Admin.AddRoleToUserViewModel
+@if (Model.IsSuccess == false)
+{
+    <h4 class="text-xs-center alert alert-info">افزودن نقش به کاربر @Model.User.FullName</h4>
+
+    <div class="row">
+        <div class="col-xs-12" id="AddRole">
+            <form asp-action="AddRoleToUser" asp-controller="AdminUsers" asp-area="Admin"
+                  data-ajax="true"
+                  data-ajax-method="POST"
+                  data-ajax-mode="replace"
+                  data-ajax-update="#AddRole">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="UserId" />
+                <div class="form-group">
+                    <label asp-for="RoleId" class="control-label"></label>
+
+                    <select asp-for="RoleId" class="form-control">
+                        <option value="">سمت را انتخاب کنید ...</option>
+                        @foreach (var role in Model.Roles)
+                        {
+                            <option value="@role.RoleId">@role.RoleTitle</option>
+                        }
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ParentURId" class="control-label"></label>
+                    <select asp-for="ParentURId" class="form-control">
+                        <option value="">ناظر را انتخاب کنید...</option>
+                        @foreach (var par in Model.Parents)
+                        {
+                            <option value="@par.URId">@par.User.FullName @par.Role.RoleTitle</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ParentURId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="ثبت" class="btn btn-primary col-xs-12" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+}
+else
+{
+    <h2 class="text-xs-center alert alert-success">نقش با موفقیت به کاربر اضافه شد</h2>
+}
+
+

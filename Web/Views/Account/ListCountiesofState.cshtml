@@ -1,0 +1,9 @@
+﻿@model IEnumerable<DataLayer.Entities.ComplementaryInfo.County>
+    <option value="">شهرستان خود را انتخاب کنید ...</option>
+    @foreach (var itemC in Model)
+    {
+        <option value="@itemC.CountyId">@itemC.CountyName</option>
+    }
+
+
+    

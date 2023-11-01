@@ -1,0 +1,296 @@
+﻿@model Core.DTOs.Account.RegisterViewModel
+@using System.Globalization;
+@{
+    ViewData["Title"] = "ثبت نام در سایت بیمه پاسارگاد";
+    Layout = "~/Views/Shared/_AcLayout.cshtml";
+    PersianCalendar pc = new PersianCalendar();
+    int sYear = pc.GetYear(DateTime.Now) - 18;
+    int eYear = pc.GetYear(DateTime.Now) - 100;
+}
+
+<div class="col-md-12 pt-2 pb-2">
+    <h2 class="text-xs-center alert alert-info">ثبت نام</h2>
+    <form asp-action="Register">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <div class="input-group">
+                <input tabindex="1" asp-for="UserFirstName" class="form-control" placeholder="نــام">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-user text-info"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="UserFirstName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <input tabindex="2" asp-for="UserFamily" class="form-control" placeholder="نام خانوادگی">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-user-md text-success"></i></span>
+                </div>
+
+            </div>
+            <span asp-validation-for="UserFamily" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <select tabindex="3" asp-for="BDateYear" class="form-control">
+                    <option value="">سال تولد</option>
+                    @for (int y = eYear; y <= sYear; y++)
+                    {
+                        <option value="@y">@y</option>
+                    }
+                </select>
+                <select tabindex="4" asp-for="BDateMounth" class="form-control">
+                    <option value="">ماه تولد</option>
+                    @for (int m = 1; m <= 12; m++)
+                    {
+                        <option value="@m">@m</option>
+                    }
+                </select>
+                <select tabindex="5" asp-for="BDateDay" class="form-control">
+                    <option value="">روز تولد</option>
+                    @for (int d = 1; d <= 31; d++)
+                    {
+                        <option value="@d">@d</option>
+                    }
+                </select>
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="bell fa fa-bell text-danger" title="حداقل سن ثبت نام 18 سال می باشد !"></i></span>
+                    <span class="input-group-text"><i class="fa fa-calendar text-warning" title="حداقل سن ثبت نام 18 سال می باشد !"></i></span>
+
+                </div>
+
+            </div>
+            <span asp-validation-for="BDateYear" class="text-danger col-xs-12"></span>
+            <span asp-validation-for="BDateMounth" class="text-danger col-xs-12"></span>
+            <span asp-validation-for="BDateDay" class="text-danger col-xs-12"></span>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <input tabindex="6" asp-for="UserNC" class="form-control" placeholder="کــد ملی">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-certificate text-info"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="UserNC" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <div class="input-group ">
+                <input tabindex="7" asp-for="UserCellphone" class="form-control" placeholder="تلفن همراه">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-phone-square  text-success"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="UserCellphone" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group ">
+                <div class="input-group-append">
+                    @{
+                        string mess = "از جدا کننده . استفاده شود" + "\n\n" + "مثال  3901.8000.14575602.1";
+                    }
+                    <span class="input-group-text" title="@mess"><i class="fa fa-question-circle text-danger"></i></span>
+                </div>
+                <input tabindex="8" asp-for="BankAccountNumber" id="ban" dir="ltr" class="form-control " placeholder="شماره حساب بانک پاسارگاد : xxx.xxxx.xxxxxxxx.x " />
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-bank text-info"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          
+            <div class="input-group ">
+                <div class="input-group-append">
+                    @{
+                        string messBC = "فقط اعداد شماره کارت را وارد کنید" + "\n\n" + "سیستم از جداکننده - در جای لازم استفاده خواهد کرد";
+                    }
+                    <span class="input-group-text" title="@messBC"><i class="fa fa-question-circle text-danger"></i></span>
+                </div>
+                <input asp-for="BankCardNumber" tabindex="9" dir="ltr" class="form-control" placeholder="اعداد وارد شوند- شماره کارت بانک پاسارگاد:xxxx-xxxx-xxxx-xxxx" id="credit-card" value="" maxlength="19" />
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-id-card  text-success"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="BankCardNumber" class="text-danger col-xs-12"></span>
+            
+        </div>
+        <div class="form-group">
+            <div class="input-group ">
+
+                <select tabindex="13" asp-for="Education" class="form-control form-control-lg">
+                    <option value="">تحصیلات خود را انتخاب کنید</option>
+                    <option value="زیردیپلم">زیردیپلم</option>
+                    <option value="دیپلم">دیپلم</option>
+                    <option value="فوق دیپلم">فوق دیپلم</option>
+                    <option value="لیسانس">لیسانس</option>
+                    <option value="فوق لیسانس">فوق لیسانس</option>
+                    <option value="دکترا">دکترا</option>
+                </select>
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-book  text-warning"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="Education" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <div class="input-group ">
+                <select tabindex="14" asp-for="Sex" class="form-control form-control-lg">
+                    <option value="">جنسیت خود را انتخاب کنید ...</option>
+                    <option value="1">مــرد</option>
+                    <option value="0">زن</option>
+                </select>
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-tag  text-success"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="Sex" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <div class="input-group ">
+                <select tabindex="15" asp-for="StateId" class="form-control form-control-lg" id="state">
+                    <option value="">استان خود را انتخاب کنید...</option>
+                    @foreach (var state in Model.States)
+                    {
+                        if (Model.StateId == state.StateId)
+                        {
+                            <option selected value="@state.StateId">@state.StateName</option>
+                        }
+                        else
+                        {
+                            <option value="@state.StateId">@state.StateName</option>
+                        }
+
+                    }
+                </select>
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-building  text-info"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="StateId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <div class="input-group ">
+                <select tabindex="16" asp-for="CountyId" class="form-control form-control-lg" id="county">
+                    <option value="">شهرستان خود را انتخاب کنید ...</option>
+                    @if (Model.Counties != null)
+                    {
+                        if (Model.Counties.Count() != 0)
+                        {
+                            foreach (var county in Model.Counties)
+                            {
+                                if (Model.CountyId == county.CountyId)
+                                {
+                                    <option selected value="@county.CountyId">@county.CountyName</option>
+                                }
+                                else
+                                {
+                                    <option value="@county.CountyId">@county.CountyName</option>
+                                }
+                            }
+                        }
+                    }
+
+                </select>
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-building-o  text-success"></i></span>
+                </div>
+            </div>
+            <span asp-validation-for="CountyId" class="text-danger"></span>
+        </div>
+        <hr />
+        <div class="form-group">
+            <div class="input-group ">
+                <input tabindex="17" asp-for="SponserCode" class="form-control" placeholder="کد سازمانی ناظر">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i id="infoTag" class="bell fa fa-bell  text-danger"></i></span>
+                    <span class="input-group-text" id="parentInfo">مشاهده اطلاعات ناظر</span>
+                </div>
+            </div>
+            <span asp-validation-for="SponserCode" class="text-danger"></span>
+        </div>
+        <div class="form-group ">
+            <input tabindex="18" type="submit" value="ثبت نام" class="btn btn-primary col-xs-12" />
+            <a href="/Login" tabindex="19" class="col-xs-12 text-xs-center btn btn-outline-success mt-2"
+               id="btnLog">
+                قبلا ثبت نام کرده ام !
+            </a>
+            <a href="/" tabindex="20" class="col-xs-12 text-xs-center btn btn-outline-info mt-2 mbmm-5">
+                صفحه اصلی
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        $("#state").change(function () {
+            var sval = $(this).val();
+            $.ajax({
+                url: "/Account/ListCountiesofState",
+                data: { stateId: sval },
+                type: "GET"
+            }).done(function (result) {
+                $("#county").html(result);
+            });
+
+        });
+       
+        $(".bcn").on("keyup", function (e) {
+            var val = $(this).val();
+            if (val.length === 4) {
+                e.preventDefault();
+                $(this).next('.bcn').focus();
+            }
+        });
+        $("#SponserCode").on("keyup", function (e) {
+            //e.preventDefault();
+            var code = $(this).val();
+            $.ajax({
+                url: "/Account/CheckCode",
+                data: { Code: code },
+                type: "GET",
+                async: "true",
+                success: function (result) {
+                    console.log(result);
+                    if (result.validate === false) {
+                        $("#infoTag").removeClass("text-success");
+                        $("#infoTag").addClass("text-danger");  
+                        $("input[type='submit']").attr('disabled', 'disabled');
+                    }
+                    else {
+                         $("#infoTag").removeClass("text-danger");
+                        $("#infoTag").addClass("text-success");
+                        $("input[type='submit']").removeAttr("disabled")
+                    }
+                    //$("#infoTag").attr("Title", result.message);
+                    $("#parentInfo").text(result.message);
+                }
+            });
+        });   
+        $('#credit-card').keypress(function (e) {
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                //display error message
+                
+                return false;
+            }
+            var rawNumbers = $(this).val().replace(/-/g, '');
+            var cardLength = rawNumbers.length;
+            if (cardLength !== 0 && cardLength <= 12 && cardLength % 4 == 0) {
+                $(this).val($(this).val() + '-');
+            }
+        });
+        $("#ban").keypress(function (e) {
+            var txt = String.fromCharCode(e.which);
+            console.log(txt + ' : ' + e.which);
+            if (!txt.match(/[0-9+#.]/)) {
+                return false;
+            }
+        })
+    });
+</script>

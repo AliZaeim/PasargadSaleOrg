@@ -1,0 +1,50 @@
+﻿@model IEnumerable<DataLayer.Entities.Blogs.Publisher>
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@{
+    ViewData["Title"] = "لیست ناشران";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@*@{
+    int roleId = int.Parse(User.FindFirst("RoleId").Value);
+}*@
+<h1 class="text-xs-center alert alert-info">ناشران خبر</h1>
+@*@if (_userService.CheckPermission(78, User.Identity.Name, roleId))
+{*@
+    <p>
+        <a asp-action="Create" class="btn btn-success">ثبت ناشر</a>
+    </p>
+@*}*@
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Publisher_Title)
+            </th>
+
+            <th class="text-xs-center align-middle"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Publisher_Title)
+                </td>
+
+                <td class="text-xs-center align-middle">
+                    @*@if (_userService.CheckPermission(79, User.Identity.Name, roleId))
+                    {*@
+                        <a asp-action="Edit" asp-route-id="@item.Publisher_Id">ویرایش</a> <span> | </span>
+                    @*}
+                    @if (_userService.CheckPermission(80, User.Identity.Name, roleId))
+                    {*@
+                        <a asp-action="Delete" asp-route-id="@item.Publisher_Id">حــذف</a>
+                    @*}*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

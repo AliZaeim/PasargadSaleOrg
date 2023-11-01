@@ -1,0 +1,273 @@
+﻿@model Core.DTOs.Admin.ReportUserRolesViewModel;
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IUserService userService
+@{
+    ViewData["Title"] = "همکاران من";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    DataLayer.Entities.User.User user = await userService.GetUserByUserName(User.Identity.Name);
+}
+<div>
+    <div class="col-md-1 col-xs-12"></div>
+    <div class="col-md-10 col-xs-12">
+        @if (User != null)
+        {
+            <h2 class="text-xs-center alert alert-info">لیست کامل همکاران  @user.FullName</h2>
+        }
+        else
+        {
+            <h2 class="text-xs-center alert alert-info">لیست کامل همکاران</h2>
+
+        }
+    </div>
+    <div class="col-md-1 col-xs-12">
+        <form action="WriteUsersExcelFile" method="post">
+            <button type="submit" title="ثبت گزارش اکسل" class="btn btn-outline-primary float-xs-left mb-1"><span class="fa fa-file-excel-o orange"></span></button>
+        </form>
+    </div>
+
+    <div class="form-group  col-xs-12 pr-0 pl-0">
+        <form action="CoworkersInfo" method="post" class="form-inline">
+            <div class="col-md-5 col-xs-12 mb-1 form-group">
+                <input class="col-xs-12 input-lg text-xs-center" name="search" type="text" autofocus autocomplete="off" placeholder="جستجو...">
+
+            </div>
+            <div class="col-md-5 col-xs-12 mb-1 form-group">
+                <input type="number" name="RecCount" class="col-md-5 col-xs-6 text-xs-center" placeholder="تعداد" data-toggle="tooltip" data-placement="top" title="تعداد در صفحه" value="@Model.RecCount" />
+                <input type="number" maxlength="5" name="page" class="offset-md-2 col-md-5 col-xs-6  text-xs-center" placeholder="برو به ؟" data-toggle="tooltip" data-placement="top" title="انتقال به صفحه" />
+            </div>
+            <div class="col-md-2 col-xs-12 form-group">
+                <input type="submit" value="تایید" class="col-xs-12" />
+            </div>
+        </form>
+    </div>
+    <div class="col-xs-12 pt-1 mb-2 border-grey">
+        <div class="col-md-2 col-xs-6 mb-1">کل داده ها : <span class="tag tag-info ">@Model.AllUserRoles.Count()</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">کل صفحات : <span class="tag tag-success">@Model.TotalPages</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">صفحه فعلی : <span class="tag tag-info">@Model.CurPage</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">تعداد در صفحه : <span class="tag tag-success">@Model.RecCount</span></div>
+        <div class="col-md-4 col-xs-12">جستجو براساس : <span class="tag tag-warning ">@Model.SearchText</span></div>
+
+    </div>
+</div>
+<div class="table-responsive">
+
+
+    <table class="table table-bordered sortable table-numberedRows" id="tblUsers">
+        <thead>
+            <tr class="cursor-pointer fs-12">
+
+                <th class="text-xs-center align-middle">
+                    نام کامل
+                </th>
+                <th class="text-xs-center align-middle">
+                    سِمَت
+                </th>
+                <th class="text-xs-center align-middle">
+                    کد ملی
+                </th>
+                <th class="text-xs-center align-middle">
+                    تاریخ تولد
+                </th>
+                <th class="text-xs-center align-middle p-0">کد کاربری</th>
+                <th class="text-xs-center align-middle p-0">تلفن همراه</th>
+                <th class="text-xs-center align-middle">رمز</th>
+                <th class="text-xs-center p-0 width-20-per align-middle">
+                    ناظر
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    تاریخ ثبت
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    عملیات
+                </th>
+
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @{int radif = 1;}
+            @*//order by descending base on code in service*@
+            @foreach (var item in Model.PageUserRoles.OrderByDescending(r => int.Parse(r.User.Code)).ToList())
+            {
+                <tr class="text-xs-center align-middle border">
+
+                    <td class="align-middle fs-14 p-0">
+                        @item.User.FullName
+                    </td>
+                    <td class="align-middle fs-14 p-0">
+                        @item.Role.RoleTitle
+                    </td>
+                    <td class="align-middle fs-14 p-0">
+                        @item.User.NC
+                    </td>
+                    <td class="align-middle fs-14 p-0">
+                        @item.User.BirthDate.ToShamsi()
+                    </td>
+                    <td class="align-middle p-0">
+                        @item.User.Code
+                    </td>
+                    <td class="align-middle p-0">
+                        @item.User.Cellphone
+                    </td>
+                    <td class="align-middle fs-14 p-0">
+                        @if (item.RoleId != 1)
+                        {
+
+                            <div class="form-group">
+
+                                <input id="@radif" type="password" class="col-xs-9 no-border  password-field" readonly name="password" value="@item.User.Password">
+                                <span toggle="#@radif" class="col-xs-3 cursor-pointer fa fa-fw fa-eye field-icon toggle-password"></span>
+
+                            </div>
+
+                        }
+                        else
+                        {
+                            <span>***</span>
+                        }
+
+                    </td>
+
+                    <td class="align-middle valign-middle p-0 ">
+                        @if (item.UserRoleParent != null)
+                        {
+
+                            @foreach (var p in Model.PageUserRoles.Where(w => w.User_ID == item.User_ID && w.RoleId == item.RoleId).OrderByDescending(r => r.IsActive).ToList())
+                            {
+
+                                var userrole = await userService.GetUserRoleByIdAsync((int)p.UserRoleParentId);
+                                string ParentPro = "بدون ناظر";
+                                if (userrole.UserRoleParent != null)
+                                {
+                                    ParentPro = userrole.UserRoleParent.FullPro;
+                                }
+                                if (p.IsActive == true)
+                                {
+                                    <span class="text-success fs-11 Bold m-b-2 col-xs-12">
+                                        @userrole.FullPro
+                                        @if (userrole.User.Code != "290070")
+                                        {
+                                            <span> | @userrole.User.Code </span>
+                                        }
+                                    </span>
+                                }
+
+                            }
+
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+
+                    </td>
+                    <td class="align-middle fs-12 p-0">
+                        @item.RegisterDate.ToShamsiWithTime()
+
+                    </td>
+
+
+
+
+                    <td class="text-xs-center align-middle p-0">
+
+
+                        <a href="/Admin/AdminUsers/CoworkersDetails?urid=@item.URId" target="_blank" data-toggle="tooltip" data-placement="top" title="جزئیات">
+                            <i class="fa fa-list-alt fa-x info"></i>
+                        </a>
+
+                    </td>
+
+                </tr>
+                { radif++; }
+            }
+        </tbody>
+    </table>
+    <input type="hidden" id="stext" value="@Model.SearchText" />
+</div>
+
+@section Scripts{
+
+
+    <script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/sorttable.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".toggle-password").click(function () {
+
+                $(this).toggleClass("fa-eye fa-eye-slash");
+                var input = $($(this).attr("toggle"));
+
+                if (input.attr("type") == "password") {
+                    input.attr("type", "text");
+                } else {
+                    input.attr("type", "password");
+                }
+            });
+
+            $("tbody td").on("mouseover", function () {
+                var row_index = $(this).parent().index();
+                var col_index = $(this).index();
+                $(this).prop("title", row_index + 1);
+            });
+            var srch = $("#stext").val();
+            if (srch !== "") {
+                var term = srch;
+
+                var $context = $("table tbody tr");
+                $context.show().unmark();
+                if (term) {
+                    $context.mark(term, {
+                        "className": "bg-warning",
+                        "separateWordSearch": true,
+                        "accuracy": "complementary",
+                        done: function () {
+                            $context.not(":has(mark)").hide();
+                        }
+                    });
+                }
+            }
+            $("#myInput").keypress(function (e) {
+                if (e.keyCode === 13) {
+                    var $context = $("table tbody tr");
+                    $context.show().unmark();
+                    var term = $("#myInput").val();
+                    if (term) {
+                        $context.mark(term, {
+                            "className": "bg-warning",
+                            "separateWordSearch": false,
+                            "accuracy": "exactly",
+                            done: function () {
+                                $context.not(":has(mark)").hide();
+                            }
+                        });
+                    }
+
+                }
+            });
+            $("#btnSearch").click(function () {
+                var term = $("#myInput").val();
+
+                var $context = $("table tbody tr");
+                $context.show().unmark();
+                if (term) {
+                    $context.mark(term, {
+                        "className": "bg-warning",
+                        "separateWordSearch": false,
+                        "accuracy": "exactly",
+                        done: function () {
+                            $context.not(":has(mark)").hide();
+                        }
+                    });
+                }
+            })
+
+
+
+        });
+
+    </script>
+
+}

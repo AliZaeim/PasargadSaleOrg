@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-180920587-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-180920587-1');
+    </script>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link href="~/SiteRef/fonts/fontawesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/SiteRef/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/SiteRef/js/main.js"></script>
+    <link href="~/SiteRef/css/zStyle.css" rel="stylesheet" />
+    <link href="~/favicon.png" rel="icon">
+    <meta name="google-site-verification" content="2qn4pwDMQ3fkZ71Nq2_pgWkIAQ9ulcCZ86bnZUCBQcI" />
+</head>
+<body dir="rtl">
+
+    <h1 class="text-xs-center mtcm-1">شرکت بیمه پاسارگاد</h1>
+    <h3 class="text-xs-center mtmm-5">مدیریت سازمان فروش</h3>
+    <div class="container" id="div0">
+        <div class="row " id="div1">
+
+            <div class="col-md-4 col-xs-12 text-xs-center" id="div11">
+                <img src="~/images/pasSA.jpg" class="zvaCenter" alt="مدیریت سازمان فروش شرکت بیمه پاسارگاد">
+            </div>
+            <div class="col-md-8 col-xs-12" id="div12">
+
+                @RenderBody()
+
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
+

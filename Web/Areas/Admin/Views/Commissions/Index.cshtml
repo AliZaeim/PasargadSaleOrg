@@ -1,0 +1,78 @@
+﻿@model IEnumerable<DataLayer.Entities.User.RoleCommission>
+@{
+    ViewData["Title"] = "لیست کارمزدهای نقش";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="text-xs-center alert alert-info">لیست کامل کارمزدهای نقش</h1>
+
+<p>
+    <a asp-controller="Users" asp-action="Create" class="btn btn-success">ثبت کارمزد جدید</a>
+    
+</p>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-xs-center align-middle p-0">#</th>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.Role.RoleTitle)
+                </th>
+
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.PersonalSalesPercent)
+                </th>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.OrganizationSalesPercent)
+                </th>
+
+                <th class="text-xs-center p-0 align-middle">
+                    @Html.DisplayNameFor(model => model.MinSaleValue)
+                </th>
+
+                <th class="text-xs-center p-0 align-middle">
+                    @Html.DisplayNameFor(model => model.MinSaleCount)
+                </th>
+
+
+                <th class="text-xs-center align-middle">
+                    عملیات
+                </th>
+
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @{int radif = 1;}
+            @foreach (var item in Model)
+            {
+                <tr class="text-xs-center align-middle border">
+                    <td class="align-middle p-0">@radif</td>
+                    <td class="align-middle p-0">
+                        @item.Role.RoleTitle
+                    </td>
+
+                    <td class="align-middle p-0">
+                        @item.PersonalSalesPercent
+                    </td>
+                    <td class="align-middle p-0">
+                        @item.OrganizationSalesPercent
+                    </td>
+
+                    <td class="align-middle p-0">
+                        @item.MinSaleValue
+                    </td>
+
+                    <td class="align-middle p-0">
+                        @item.MinSaleCount
+                    </td>
+
+                    <td class="text-xs-center align-middle">
+                        
+                    </td>
+
+                </tr>
+                { radif++; }
+            }
+        </tbody>
+    </table>
+</div>

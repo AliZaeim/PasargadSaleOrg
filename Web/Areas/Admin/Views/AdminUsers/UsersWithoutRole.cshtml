@@ -1,0 +1,158 @@
+﻿@model IEnumerable<DataLayer.Entities.User.User>
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IUserService userService
+@inject IPermissionService permissionService
+@{
+    ViewData["Title"] = "لیست کامل کاربران بدون نقش";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="text-xs-center alert alert-info">لیست کاربران بدون نقش</h1>
+
+
+<div class="row">
+    <div class="container">
+
+        <div class="offset-md-3 col-md-6">
+            <input class="form-control" id="myInput" type="text" placeholder="جستجو...">
+            <br />
+        </div>
+
+
+    </div>
+
+
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-xs-center align-middle p-0">#</th>
+                <th class="text-xs-center align-middle">
+                    نام کامل
+                </th>
+
+                <th class="text-xs-center align-middle">کد کاربری</th>
+                <th class="text-xs-center p-0 align-middle">
+                    کد ملی
+                </th>
+
+                <th class="text-xs-center p-0 align-middle">
+                    تاریخ ثبت
+                </th>
+
+                <th class="text-xs-center p-0 align-middle">
+                    وضعیت کاربر
+                </th>
+                <th class="text-xs-center p-0 align-middle">
+                    آمار اولیه
+                </th>
+                
+
+                <th class="text-xs-center align-middle">
+                    عملیات
+                </th>
+
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @{int radif = 1;}
+            @foreach (var item in Model.OrderByDescending(r => r.RegDate).ThenBy(r => r.RegDate.ToLongTimeString()))
+            {
+                <tr class="text-xs-center align-middle border">
+                    <td class="align-middle p-0">@radif</td>
+                    <td class="align-middle p-0 fullname">
+                        @item.FullName
+                    </td>
+
+                    <td class="align-middle p-0">
+                        @item.Code
+                    </td>
+                    <td class="align-middle p-0">
+                        @item.NC
+                    </td>
+
+                    <td class="align-middle p-0">
+                        @item.RegDate.ToShamsi() | @item.RegDate.ToShortTimeString()
+                    </td>
+
+                    <td class="align-middle p-0">
+                        @if (item.IsActive == true)
+                        {
+                            <span class="fa fa-check cursor-pointer text-success" data-toggle="tooltip" data-placement="top" title="فعال"></span>
+                        }
+                        else
+                        {
+                            <span class="fa fa-check-square cursor-pointer text-danger" data-toggle="tooltip" data-placement="top" title="غیر فعال"></span>
+                        }
+                    </td>
+                    <td class="text-xs-center align-middle">
+                        <form action="/Admin/AdminUsers/EditInitialStatic" method="post">
+                            <input type="hidden" name="userId" value="@item.Id" />
+                            <input type="number" name="InitialStatic" class="text-xs-center" title="آمار فروش" placeholder="آمار اولیه فروش" value="@item.InitialStatic" />
+                            <input type="number" name="InitialPortfo" class="text-xs-center" title="پورتفو" placeholder="آمار اولیه پورتفو" value="@item.InitialPortfo" />
+                            <button type="submit" class="btn btn-primary" title="در صورت استفاده از این دکمه آمار اولیه اصلاح می شود">اصلاح</button>
+                        </form>
+
+                    </td>
+                    @{
+                        string docs = string.Empty;
+                        int count = item.Documents.Count();
+                        int r = 1;
+                        foreach (var d in item.Documents)
+                        {
+                            if (r < count)
+                            {
+                                docs += d.Name + Environment.NewLine;
+                            }
+                            else
+                            {
+                                docs += d.Name;
+                            }
+
+                        }
+                    }
+                    
+
+                    <td class="text-xs-center align-middle">
+                        <a href="/Admin/AdminUsers/EditUser?Id=@item.Id">ویرایش</a>
+                        
+                    </td>
+
+                </tr>
+                { radif++; }
+            }
+        </tbody>
+    </table>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".btnAddRole").click(function () {
+                var uid = $(this).attr("data-userId");
+                var name = $(this).parent().siblings('.fullname').text();
+
+                var title = "افزودن نقش ";
+                $.ajax({
+                    url: "/Admin/AdminUsers/AddRoleToUser",
+                    data: { userId: uid },
+                    type: "GET",
+                    success: function (result) {
+
+                        $("#AdminModalTitle").text(title);
+                        $("#AdminModalBody").html(result);
+                        $("#AdminModal").modal('show');
+
+                    }
+                })
+            })
+        });
+    </script>
+
+
+
+}

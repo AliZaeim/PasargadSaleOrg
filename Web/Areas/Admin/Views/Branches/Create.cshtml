@@ -1,0 +1,77 @@
+﻿@model DataLayer.Entities.ComplementaryInfo.Branch
+
+@{
+    ViewData["Title"] = "ثبت شعبه جدید";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">ثبت شعبه جدید</h2>
+
+
+<div class="row">
+    <div class="offset-md-4 col-md-4 col-xs-12">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="BrName" class="control-label"></label>
+                <input asp-for="BrName" class="form-control" />
+                <span asp-validation-for="BrName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BrCode" class="control-label"></label>
+                <input asp-for="BrCode" class="form-control" />
+                <span asp-validation-for="BrCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BrField" class="control-label"></label>
+                <input asp-for="BrField" class="form-control" />
+                <span asp-validation-for="BrField" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BrAttribution" class="control-label"></label>
+                <input asp-for="BrAttribution" class="form-control" />
+                <span asp-validation-for="BrAttribution" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ManagerName" class="control-label"></label>
+                <input asp-for="ManagerName" class="form-control" />
+                <span asp-validation-for="ManagerName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateofStablishment" class="control-label"></label>
+                <input asp-for="DateofStablishment" class="form-control" />
+                <span asp-validation-for="DateofStablishment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Fax" class="control-label"></label>
+                <input asp-for="Fax" class="form-control" />
+                <span asp-validation-for="Fax" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ثبت" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">بازگشت</a>
+</div>
+@section Scripts
+{
+    <script src="~/LayoutRef/js/jquery.validate.js"></script>
+    <script src="~/LayoutRef/js/jquery.validate.unobtrusive.js"></script>
+   
+}
+
+

@@ -1,0 +1,180 @@
+﻿@model DataLayer.Entities.User.UserRole
+@using Core.Convertors;
+@using DataLayer.Entities.User;
+@using Core.Services.Interfaces;
+@inject IUserService userService
+@{
+    ViewData["Title"] = "جزئیات کامل کاربر";
+    List<Role> roles = await userService.GetAllRolesofUserWithNameAsync(Model.User.Code);
+    List<UserRole> userRoles = await userService.GetUserRolesByUserCode(Model.User.Code);
+}
+
+<h1 class="text-xs-center alert alert-info">
+    جزئیات کامل کاربر @Model.User.FullName
+    <a asp-action="CoworkersInfo" class="btn btn-warning float-xs-left"><i class="fa fa-reply"></i></a>
+</h1>
+
+<div class="border p-2">
+
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.RegDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.User.RegDate.ToShamsiWithTime()
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.FullName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.FullName)
+        </dd>
+
+        <dt class="col-sm-2">
+            مسئولیت ها
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var item in userRoles.OrderByDescending(r => r.IsActive))
+            {
+                if (item.IsActive)
+                {
+                    <span class="tag tag-success">@item.Role.RoleTitle - ناظر : @item.UserRoleParent?.FullPro | تاریخ دریافت نقش : @item.RegisterDate.ToShamsiWithTime() | فعال</span>
+                }
+                else
+                {
+                    <span class="tag tag-default">@item.Role.RoleTitle - ناظر : @item.UserRoleParent?.FullPro | تاریخ دریافت نقش : @item.RegisterDate.ToShamsiWithTime() | غیرفعال</span>
+                }
+
+            }
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.Cellphone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.Cellphone)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.Phone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.Phone)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.NC)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.NC)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.BirthDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.User.BirthDate.ToShamsi()
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.FatherName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.FatherName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.Education)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.Education)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.Email)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.HomeAddress)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.County.State.StateName) - @Html.DisplayFor(model => model.User.County.CountyName) - @Html.DisplayFor(model => model.User.HomeAddress)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.HomePostalCode)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.HomePostalCode)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.WorkAddress)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.WorkAddress)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.WorkPostalCode)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.WorkPostalCode)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.Code)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.Code)
+        </dd>
+
+        <dt class="col-sm-2">
+            ناظر
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.SponserCode)
+
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.InitialPortfo)
+        </dt>
+        <dd>
+            @Model.User.InitialPortfo.ToString("N0")
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.InitialStatic)
+        </dt>
+        <dd>
+            @Model.User.InitialStatic.ToString("N0")
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.IsActive)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.User.IsActive == true)
+            {
+                <span>فعال</span>
+            }
+            else
+            {
+                <span>غیر فعال</span>
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.BankAccountNumber)
+        </dt>
+        <dd>
+            @Model.User.BankAccountNumber
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.BankCardNumber)
+        </dt>
+        <dd>
+            @Model.User.BankCardNumber
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.SponserBranch)
+        </dt>
+        <dd>
+            @Model.User.SponserBranch
+        </dd>
+
+    </dl>
+</div>
+

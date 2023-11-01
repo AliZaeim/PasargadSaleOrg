@@ -1,0 +1,248 @@
+﻿@model Core.DTOs.Admin.UploadViewModel
+
+@{
+    ViewData["Title"] = "آپلود اطلاعات بوردرو";
+
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@{
+    bool locked = false;
+
+    if (Model.ValidationStep1)
+    {
+        locked = true;
+
+    }
+}
+<h2 class="text-xs-center alert alert-info">آپلود اطلاعات بوردرو</h2>
+
+
+
+<div class="row">
+    <div class="col-md-4 col-xs-12">
+        <h1 class="text-xs-center text-danger border-bottom mb-1">توجه</h1>
+        <p class="text-justify">
+            1- در عملیات افزودن، فایل با دیتابیس مقایسه شده و فقط رکوردهای جدید اجازه افزوده شدن خواهند داشت در غیر این صورت فایل برای عملیات افزودن معتبر نمی باشد.
+        </p>
+        <p class="text-justify">
+            2- در عملیات بازنشانی، اطلاعات موجود در فایل جایگزین اطلاعات موجود در دیتابیس خواهند شد.
+        </p>
+    </div>
+    <div class="pr-3 col-md-4 col-xs-12 border-right">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" name="ValidationStep1" asp-for="ValidationStep1" checked="@Model.ValidationStep1" value="@Model.ValidationStep1" />
+            <input type="hidden" name="ExistDuration" asp-for="ExistDuration" checked="@Model.ExistDuration" value="@Model.ExistDuration" />
+
+            @if (!string.IsNullOrEmpty(Model.Message))
+            {
+                <h4 class="text-xs-center alert alert-warning">@Model.Message</h4>
+            }
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <label asp-for="Mounth" class="control-label"></label>
+                    <select asp-for="Mounth" name="Mounth" disabled="@locked" class="form-control">
+                        @for (int i = 1; i < 12; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+
+                </div>
+                <div class="col-xs-6">
+                    <label asp-for="Year" class="control-label"></label>
+                    <select asp-for="Year" name="Year" disabled="@locked" class="form-control">
+                        @for (int i = 1399; i < 1499; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+
+                </div>
+
+                <span asp-validation-for="Mounth" class="text-danger m-t-5"></span>
+                <span asp-validation-for="Year" class="text-danger m-t-5"></span>
+            </div>
+
+
+
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" name="Type" disabled="@locked" class="form-control">
+                    <option value="">نوع فایل را انتخاب کنید</option>
+                    <option value="bordro">بوردرو</option>
+                    <option value="commission">کارمزد</option>
+
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            @if (Model.ValidationStep1 == false && Model.ExistDuration == false)
+            {
+                <div class="form-group">
+                    <input type="submit" id="step1" formaction="/Admin/Upload/Create" value="بررسی دوره" class="btn btn-primary col-xs-12" />
+                </div>
+            }
+            else
+            {
+                @if (Model.ExistDuration == true)
+                {
+
+                    <div class="form-group">
+                        <label asp-for="Action" class="control-label"></label>
+                        <select asp-for="Action" class="form-control">
+                            @if (Model.Type == "bordro")
+                            {
+                                <option value="add">افزودن</option>
+                            }
+
+                            <option value="replace">بازنشانی</option>
+                        </select>
+                        <span asp-validation-for="Action" class="text-danger"></span>
+                    </div>
+                }
+                else
+
+                {
+                    <div class="form-group">
+                        <label asp-for="Action" class="control-label"></label>
+                        <select asp-for="Action" class="form-control">
+                            <option value="add">افزودن</option>
+
+                        </select>
+                        <span asp-validation-for="Action" class="text-danger"></span>
+                    </div>
+                }
+
+
+                <div class="form-group">
+                    <label asp-for="File" class="control-label"></label>
+                    <input type="file" name="File" accept=".xlsx" asp-for="File" class="form-control" />
+                    <span id="statusFile" class="m-t-5 m-b-10"></span>
+                    <span asp-validation-for="File" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" id="step2" disabled formaction="/Admin/Upload/Create" value="آپلود" class="btn btn-primary col-xs-12 " />
+                </div>
+            }
+
+
+        </form>
+    </div>
+
+</div>
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var arr = ["xlsx"];
+        function GetFileExtension(fid) {
+            var ext = $("#" + fid).val().split('.').pop();
+            return ext;
+        };
+        function GetFileVolume(fid) {
+            var f = $("#" + fid)[0].files[0].size;
+            return f;
+        }
+
+        function checkExtention(fid) {
+            var ext = $("#" + fid).val().split('.').pop();
+            var status = arr.includes(ext);
+            return status;
+        }
+        
+        $('input[type="file"]').change(function (e) {
+            //e.stopImmediatePropagation();
+            var file = $(this).val()
+            var ex = GetFileExtension("File");
+
+            ex = "<span class='tag tag-info'>" + ex + "</span>";
+            var ch = checkExtention("File");
+
+            if (ch === false) {
+                $('input[type="submit"]').attr("disabled", "disabled");
+
+                $(".upl").remove();
+                $("#statusFile").empty();
+                alert("لطفا فایل اکسل انتخاب کنید !");
+
+            }
+
+            var v = GetFileVolume("File");
+            v = parseInt(v);
+            var _size = 0;
+            if (v < 1048756) {
+                _size = Math.floor(v / 1024) + ' kb';
+            } else {
+                _size = Math.floor(v / 1048756) + ' mb';
+            }
+            var resv = "<span class='tag tag-warning ltr'>" + _size + "</span>";
+            var res = "<span class='tag tag-danger'>غیرقابل قبول</span>";
+            if (file != null) {
+
+                var formData = new FormData();
+                var comFormData = new FormData();
+                //read disabled select option
+                var ftopt = $('#Type option:selected').map(function (i, v) {
+                    return this.value;
+                }).get();
+                var act = $("#Action").val();
+                formData.append("action", act);
+                formData.append("ftype", ftopt);
+                formData.append("file", e.target.files[0]);
+
+
+                $.ajax({
+                    url: "/Admin/Upload/CheckFile",
+                    data: formData,
+                    type: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $("#Progress").show();
+                    },
+                    success: function (result) {
+
+                        if (result.conf === false) {
+
+                            $("#step2").attr('disabled', true);
+
+                            var mess = "";
+
+                            if (result.message != null) {
+                                mess = result.message;
+                            }
+                            $(".upl").remove();
+                            $("#statusFile").html(ex + " | " + res + " | " + resv + "<br />" + mess + "<br />");
+                        }
+                        else {
+                            res = "<span class='tag tag-success'>قابل قبول</span>";
+                            $("#statusFile").html(ex + " | " + res + " | " + resv);
+                            $("#step2").attr('disabled', false);
+
+                            $(".upl").remove();
+                            $("#statusFile").after(result.message);
+
+                        }
+                        $("#Progress").hide();
+                    }
+                });
+            }
+            else {
+                $('.btn').attr('disabled', true);
+                $(".upl").remove();
+                $("#statusFile").empty();
+
+            }
+
+        });
+        $('form').on('submit', function () {
+            $('input, select').prop('disabled', false);
+        });
+
+    });
+</script>
+

@@ -1,0 +1,50 @@
+﻿@model IEnumerable<DataLayer.Entities.User.User>
+@using Core.Convertors;
+@using DataLayer.Entities.User;
+@{
+    ViewData["Title"] = "لیست کاربران";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@{
+    Role role = ViewData["Role"] as Role;
+}
+
+@*<h1 class="alert alert-info text-xs-center">لیست کاربران نقش @role.RoleTitle  <span class="tag tag-pill tag-primary float-xs-left">@Model.Count()</span></h1>*@
+<div>
+    <h1 class="alert alert-info text-xs-center">
+        <span>لیست کاربران نقش @role.RoleTitle</span> <span class="tag tag-pill tag-primary ">@Model.Count()</span>
+        <a href="~/Admin/Roles/Index" class="float-xs-left text-danger">
+            <span class="icon-backward2" title="بازگشت"></span>
+        </a>
+    </h1>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">#</th>
+            <th class="text-xs-center align-middle">نام کامل</th>
+            <th class="text-xs-center align-middle">کد ملی</th>
+            <th class="text-xs-center align-middle">کد کاربری</th>
+            <th class="text-xs-center align-middle">تلفن</th>
+            <th class="text-xs-center align-middle">تاریخ ثبت نام</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @{int rad = 1;}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-xs-center align-middle">@rad</td>
+                <td class="text-xs-center align-middle">@item.FullName</td>
+                <td class="text-xs-center align-middle">@item.NC</td>
+                <td class="text-xs-center align-middle">@item.Code</td>
+                <td class="text-xs-center align-middle">@item.Cellphone</td>
+                <td class="text-xs-center align-middle">@item.RegDate.ToShamsiWithTime()</td>
+
+            </tr>
+            rad++;
+        }
+    </tbody>
+</table>

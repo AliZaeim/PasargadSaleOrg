@@ -1,0 +1,17 @@
+﻿@model ChartJSCore.Models.Chart
+@{
+    ViewData["Title"] = "PolarChart";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div>
+    <canvas id="polarChart" class="vw-100"></canvas>
+</div>
+
+@{ChartJSCore.Models.Chart chart = Model; }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+
+<script>
+        @Html.Raw(chart.CreateChartCode("polarChart"));
+</script>
+

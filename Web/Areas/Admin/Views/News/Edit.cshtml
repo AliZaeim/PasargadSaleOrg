@@ -1,0 +1,103 @@
+﻿@model DataLayer.Entities.Blogs.News
+
+@{
+    ViewData["Title"] = "ویرایش خبر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<script src="~/AdminRef/ckeditor/ckeditor.js"></script>
+<h1 class="text-xs-center alert alert-info">
+    ویرایش خبر
+    <a asp-action="Index" class="float-xs-left btn btn-warning">بازگشت</a>
+</h1>
+<ul>
+    توجه :
+    <li class="list-style-circle">خلاصه خبر حداکثر می تواند 2000 کاراکتر باشد</li>
+</ul>
+<hr />
+<div class="row">
+    <div class="col-xs-12 offset-md-3 col-md-6">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="News_Id" />
+            <input type="hidden" asp-for="News_Date" />
+            <input type="hidden" asp-for="News_Code" />
+            <input type="hidden" asp-for="News_Image" />
+            <div class="form-group">
+                <label asp-for="NewsGroup_Id" class="control-label"></label>
+                <select asp-for="NewsGroup_Id" class="form-control" asp-items="ViewBag.NewsGroup_Id"></select>
+                <span asp-validation-for="NewsGroup_Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="News_Title" class="control-label"></label>
+                <input asp-for="News_Title" class="form-control" />
+                <span asp-validation-for="News_Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="News_Abstract" class="control-label"></label><span class="float-xs-left">مانده : <span id="char-count" class="text-danger">2000</span></span>
+                <textarea asp-for="News_Abstract" rows="10" maxlength="2000" class="form-control"></textarea>
+                <span asp-validation-for="News_Abstract" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="News_Text" class="control-label"></label>
+                <textarea asp-for="News_Text" rows="20" class="form-control"></textarea>
+                <span asp-validation-for="News_Text" class="text-danger"></span>
+            </div>
+            <script>
+                CKEDITOR.replace('News_Text');
+            </script>
+            <div class="form-group">
+                <label asp-for="News_Tags" class="control-label"></label><br /> <span class="tag tag-warning mb-1">تگ ها را با خط تیره (-) از هم جدا کنید</span>
+                <textarea asp-for="News_Tags" rows="5" class="form-control"></textarea>
+                <span asp-validation-for="News_Tags" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="News_Image" class="control-label"></label><span data-toggle="tooltip" class="fa fa-question-circle-o text-warning cursor-pointer" title="حداکثر 50 کیلو بایت"></span> &ensp;
+                <span class="float-xs-left">تصویر فعلی : <img src="~/images/blogs/@Model.News_Image" id="nimg" width="32" height="32" /></span>
+
+                <input asp-for="News_Image" type="file" class="form-control" />
+                <span asp-validation-for="News_Image" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Publisher_Id" class="control-label"></label>
+                <select asp-for="Publisher_Id" class="form-control" asp-items="ViewBag.Publisher_Id"></select>
+                <span asp-validation-for="Publisher_Id" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <input type="submit" value="ویرایش" class="btn btn-primary col-xs-12" />
+                <a asp-action="Index" class="btn btn-warning col-xs-12 mt-2">بازگشت</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/LayoutRef/js/jquery.validate.js"></script>
+    <script src="~/LayoutRef/js/jquery.validate.unobtrusive.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.elevatezoom.js"></script>
+    <script>
+         $('[data-toggle="tooltip"]').tooltip();
+        $('#char-count').text(2000-$('#News_Abstract').val().length);
+        var maxchars = 2000;
+        $('#News_Abstract').keyup(function () {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0, maxchars));
+            var tlength = $(this).val().length;
+            remain = maxchars - parseInt(tlength);
+            $('#char-count').text(remain);
+        });
+        $("#nimg").elevateZoom({
+
+            zoomWindowFadeIn: 500,
+            zoomWindowFadeOut: 500,
+            lensFadeIn: 500,
+            lensFadeOut: 500,
+            zoomWindowWidth:300,
+            zoomWindowHeight: 300
+        });
+    </script>
+}
+
+

@@ -1,0 +1,232 @@
+﻿@model Core.DTOs.General.PoolRewardVM
+
+@{
+    ViewData["Title"] = "گزارش پاداش بهره وری";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">گزارش پاداش بهره وری</h2>
+
+@if (Model.IsShow == false)
+{
+    @if(!string.IsNullOrEmpty(Model.Message))
+    {
+        <h4 class="text-xs-center alert alert-danger">@Model.Message</h4>
+    }
+    <div class="row">
+        <div class="offset-md-4 col-md-4 col-xs-12">
+            <form asp-action="PoolRewardReport">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Mounth" class="control-label"></label>
+                    <select asp-for="Mounth" class="form-control">
+                        <option value="">ماه گزارش را انتخاب کنید ...</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m">@m</option>
+                        }
+
+                    </select>
+                    <span asp-validation-for="Mounth" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Year" class="control-label"></label>
+                    <select asp-for="Year" class="form-control">
+                        <option value="">سال گزارش را انتخاب کنید ...</option>
+                        @for (int y = Model.StartYear; y <= Model.CurrentYear; y++)
+                        {
+                            <option value="@y">@y</option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="ارسال" class="btn btn-primary col-xs-12" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+
+}
+else
+{
+    if(Model.CommissionBase !=null)
+    {
+
+    }
+    else
+    {
+        <h4 class="text-xs-center alert alert-danger">پاداش بهره وری قابل محاسبه نمی باشد !</h4>
+    }
+    if (User.Identity.Name != "290070")
+    {
+        <table class="table table-bordered sortable table-numberedRows">
+            <thead>
+                <tr>
+                    
+                    <th class="text-xs-center align-middle">نوع استخر</th>
+                    <th class="text-xs-center align-middle">وضعیت</th>
+                    <th class="text-xs-center align-middle">فروش دوازده ماه اخیر</th>
+                    <th class="text-xs-center align-middle">کسر / اضافه</th>
+                    <th class="text-xs-center align-middle">واجدین شرایط</th>
+                    <th class="text-xs-center align-middle">سهم</th>
+                    <th class="text-xs-center align-middle">مبلغ</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @{ int rad = 1; bool poolIsActive = false;}
+                @foreach (var item in Model.rolePools)
+                {
+                    @if (Model.poolRewardReport_TotalVMs.Any(a => a.User.Id == Model.PoolRewardReportResultVM.Loguser.Id && a.RolePool == item))
+                    {
+                        poolIsActive = true;
+                    }
+                    else
+                    {
+                        poolIsActive = false;
+                    }
+                    <tr>
+                       
+                        <td class="text-xs-center align-middle">@item.Type | @item.Symbol</td>
+                        <td class="text-xs-center align-middle">
+                            @if (poolIsActive)
+                            {
+                                <span>فعال</span>
+                            }
+                            else
+                            {
+                                <span>غیر فعال</span>
+                            }
+
+
+
+                        </td>
+                        <td class="text-xs-center align-middle">
+                            @{
+                                long SaleValue = 0;
+                                if (item.ByDirectSale == true && item.ByIndirectSale == false)
+                                {
+                                    SaleValue = Model.PoolRewardReportResultVM.LoguserDirSales;
+                                }
+                                if (item.ByDirectSale == true && item.ByIndirectSale == true)
+                                {
+                                    SaleValue = Model.PoolRewardReportResultVM.LoguserDirSales + Model.PoolRewardReportResultVM.LogUserIndirSales;
+                                }
+                                <span>@SaleValue.ToString("N0")</span>
+                            }
+                        </td>
+                        <td class="text-xs-center align-middle">
+                            @{
+                                long DifValue = 0;
+                                if (item.ByDirectSale == true && item.ByIndirectSale == false)
+                                {
+                                    DifValue = Model.PoolRewardReportResultVM.LoguserDirSales - item.Value;
+                                }
+                                if (item.ByDirectSale == true && item.ByIndirectSale == true)
+                                {
+                                    DifValue = (Model.PoolRewardReportResultVM.LoguserDirSales + Model.PoolRewardReportResultVM.LogUserIndirSales) - item.Value;
+                                }
+                                <span>@DifValue.ToString("N0")</span>
+                            }
+                        </td>
+                        <td class="text-xs-center align-middle">
+                            @{
+                                int puCount = Model.poolRewardReport_TotalVMs.Where(w => w.RolePool == item).Count();
+                            }
+                            @if (poolIsActive)
+                            {
+                                <span>@puCount</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="text-xs-center align-middle">
+                            @{
+                                var userinfo = Model.poolRewardReport_TotalVMs.FirstOrDefault(f => f.User == Model.PoolRewardReportResultVM.Loguser && f.RolePool == item);
+                            }
+                            @if (poolIsActive)
+                            {
+
+                                <span>@userinfo.SharePercent %</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="text-xs-center align-middle">
+                            @if (poolIsActive)
+                            {
+                                <span>@userinfo.ShareValue.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                    </tr>
+                    rad++;
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        @foreach (var pool in Model.rolePools.OrderBy(r => r.ByDirectSale).ThenBy(r => r.ByIndirectSale))
+        {
+            <table class="table table-bordered">
+                <caption class="text-xs-center alert alert-success">
+                    @pool.Type | @pool.Symbol |
+                    @if (pool.ByDirectSale == true & pool.ByIndirectSale == false)
+                    {
+                        <span>بر اساس فروش شخصی</span>
+                    }
+                    @if (pool.ByDirectSale == true & pool.ByIndirectSale == true)
+                    {
+                        <span>بر اساس فروش کل</span>
+                    }
+                </caption>
+                <thead>
+                    <tr>
+                        <th class="text-xs-center align-middle">#</th>
+
+                        <th class="text-xs-center align-middle">نام و نام خانوادگی</th>
+                        <th class="text-xs-center align-middle">سهم</th>
+                        <th class="text-xs-center align-middle">مبلغ</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int radadmin = 1;}
+                    @foreach (var uinfo in Model.poolRewardReport_TotalVMs.Where(w => w.RolePool == pool))
+                    {
+                        <tr>
+                            <td class="text-xs-center align-middle">@radadmin</td>
+
+                            <td class="text-xs-center align-middle">
+                               @uinfo.User.FullName
+                            </td>
+                            <td class="text-xs-center align-middle">@uinfo.SharePercent %</td>
+                            <td class="text-xs-center align-middle">@uinfo.ShareValue.ToString("N0")</td>
+                        </tr>
+                        radadmin++;
+                    }
+
+
+                </tbody>
+            </table>
+        }
+
+    }
+
+}
+

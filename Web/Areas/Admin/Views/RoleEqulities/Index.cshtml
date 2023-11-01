@@ -1,0 +1,121 @@
+﻿@model IEnumerable<DataLayer.Entities.User.RoleEqulity>
+@using Core.Services.Interfaces;
+@using DataLayer.Entities.ComplementaryInfo;
+@using Core.Convertors;
+@inject IUserService userService
+@{
+    ViewData["Title"] = "پاداشهای همسطحی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">پاداش های همسطحی</h2>
+@if (userService.CheckPermissionByNameAsync(70, User.Identity.Name))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success">پاداش جدید</a>
+    </p>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Role)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.L1EPercent)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.L2EPercent)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.L3EPercent)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.L4EPercent)
+            </th>
+            <td class="text-xs-center align-middle">سابقه تغییرات</td>
+
+            <th class="text-xs-center align-middle">عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Role.RoleTitle)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.L1EPercent)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.L2EPercent)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.L3EPercent)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.L4EPercent)
+                </td>
+                <td class="text-xs-center align-middle p-1">
+                    @{
+                        List<ChangeLog> rec = await userService.GetRecordUpdateLogs(item.Id, "RoleEqulity");
+                    }
+
+                    @if (rec != null)
+                    {
+
+                        @if (rec.Count() != 0)
+                        {
+                            <span class="fa fa-eye-slash cursor-pointer zeye w-100 text-xs-center" title="مشاهده"></span>
+                            int rd = 1;
+                            foreach (var r in rec.OrderByDescending(r => r.DateChanged))
+                            {
+                                <div class="updlist hidden">
+                                    @foreach (var t in r.DescriptionList)
+                                    {
+                                        if (!string.IsNullOrEmpty(t))
+                                        {
+                                            <p>@rd - @t</p>
+
+                                            rd++;
+                                        }
+
+                                    }
+                                    <p class="text-info text-xs-center">@r.DateChanged.ToShamsiWithTime()</p>
+                                    <hr />
+                                </div>
+
+
+                            }
+                        }
+                        else
+                        {
+                            <span class="w-100 text-xs-center">-</span>
+                        }
+
+                    }
+                    else
+                    {
+                        <span class="w-100 text-xs-center">-</span>
+                    }
+                </td>
+
+                <td class="text-xs-center align-middle">
+                    @if (userService.CheckPermissionByNameAsync(71, User.Identity.Name))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">ویرایش</a> <span>|</span>
+                    }
+                    @if (userService.CheckPermissionByNameAsync(73, User.Identity.Name))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id">حــذف</a>
+                    }
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.min.js"></script>

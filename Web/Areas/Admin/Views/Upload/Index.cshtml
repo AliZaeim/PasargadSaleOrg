@@ -1,0 +1,59 @@
+﻿@model IEnumerable<DataLayer.Entities.ComplementaryInfo.UploadInfo>
+@using Core.Convertors;
+@{
+    ViewData["Title"] = "گزارش آپلود";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">گزارش آپلود</h2>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.UpDate)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.File)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th class="text-xs-center align-middle">
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th class="text-xs-center align-middle">
+                عملیات
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderByDescending(r => r.UpDate))
+        {
+            <tr class="font-small-2">
+                <td class="text-xs-center align-middle">
+                    @item.UpDate.ToShamsiN_WithTime()
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.File)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td class="text-xs-center align-middle">
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td class="text-xs-center align-middle">
+                    <form action="DownloadFile" method="post">
+                        <input name="fileName" type="hidden" value="@item.File" />
+                        <input name="type" type="hidden" value="@item.Type" />
+                        <button type="submit" class="btn btn-info">دانلود</button>
+                    </form>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

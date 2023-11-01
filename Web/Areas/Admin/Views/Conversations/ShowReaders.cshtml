@@ -1,0 +1,68 @@
+﻿@model DataLayer.Entities.ComplementaryInfo.Conversation
+@using Core.Services.Interfaces;
+@inject IUserService _userService;
+@using Core.Convertors;
+@{
+    ViewData["Title"] = "خوانندگان پیام" + " " + Model.Subject;
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    List<string> readers = null;
+    @if (!string.IsNullOrEmpty(Model.Readers))
+    {
+        readers = Model.ReadersList.ToList();
+    }
+
+
+}
+
+<h2 class="text-xs-center alert alert-info">
+    خوانندگان پیام @Model.Subject | فرستنده پیام : @Model.SenderFullPro
+</h2>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle">
+                کــد
+            </th>
+            <th class="text-xs-center align-middle">
+                نام کامل
+            </th>
+            <th class="text-xs-center align-middle">
+                تاریخ
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in readers)
+        {
+            string[] sec = item.Split("-");
+            DateTime DT = DateTime.Parse(sec[1].ToString());
+            List<DataLayer.Entities.User.UserRole> userRoles = await _userService.GetUserRolesByUserCode(sec[0].ToString());
+            DataLayer.Entities.User.UserRole ActiveUserRole = null;
+            if (userRoles != null)
+            {
+                ActiveUserRole = userRoles.FirstOrDefault(x => x.IsActive);
+            }
+            <tr>
+                <td class="text-xs-center align-middle">
+                    @sec[0]
+                </td>
+                <td class="text-xs-center align-middle">
+                    @if (ActiveUserRole != null)
+                    {
+                        @ActiveUserRole.FullPro
+                    }
+                </td>
+                <td class="text-xs-center align-middle">
+                    @DT.ToShamsiWithTime()
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a asp-action="Index">بازگشت</a>
+</div>

@@ -1,0 +1,509 @@
+﻿@model Core.DTOs.General.SOrgCommissionsReport
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IBordroService _bordroService
+@inject IUserService _userService
+@{
+    ViewData["Title"] = "گزارش کارمزد فروش سازمانی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+}
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <h4 class="alert alert-danger text-xs-center">@Model.Message</h4>
+}
+@if (Model.OrgUserComVMs == null)
+{
+    <script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+    <link href="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.css" rel="stylesheet" />
+    <script src="~/AdminRef/app-assets/Boostrap-Select/bootstrap-select.min.js"></script>
+
+    <h2 class="alert alert-info text-xs-center">گزارش کارمزد فروش سازمانی @Model.FullName</h2>
+
+    <div class="row" lang="fa">
+        <div class="offset-md-3 col-md-6 col-xs-12">
+            <form asp-action="SOrgCommissionsPage">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Mounth" class="control-label"></label>
+                    <select asp-for="Mounth" class="form-control">
+                        <option value="">ماه گزارش را انتخاب کنید ...</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m">@m</option>
+                        }
+
+                    </select>
+                    <span asp-validation-for="Mounth" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Year" class="control-label"></label>
+                    <select asp-for="Year" class="form-control">
+                        <option value="">سال گزارش را انتخاب کنید ...</option>
+                        @for (int y = Model.StartYear; y <= Model.CurrentYear; y++)
+                        {
+                            <option value="@y">@y</option>
+                        }
+
+                    </select>
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="OrgUrIds" class="control-label"></label>
+                    <select asp-for="OrgUrIds" lang="fa" class="selectpicker form-control border-black  mt-4  show-menu-arrow "
+                            data-live-search="true" data-actions-box="true"
+                            multiple title="انتخاب کنید ..." data-header="کاربر یا کاربران مورد نظر خود را انتخاب کنید"
+                            data-style="btn-light" data-selected-text-format="count > 1"
+                            data-dropdownAlignRight="true">
+                        @foreach (var item in Model.UserRoles)
+                        {
+
+                            <option class="@((item.IsActive == true && item.UserRoleParent?.IsActive == true) ? "black" : "warning")" value="@item.URId">
+                                @item.FullPro | @item.User.Code | @item.UserRoleParent?.FullPro |
+                                @if (item.IsActive == true && item.UserRoleParent?.IsActive == true)
+                                {
+                                    <text>فعال</text>
+                                }
+                                else
+                                {
+                                    <text>غیرفعال</text>
+                                }
+                            </option>
+
+
+                        }
+                    </select>
+                    <span asp-validation-for="OrgUrIds" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="form-group">
+                    <input type="submit" value="ارسال" class="btn btn-success col-xs-12" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $('.selectpicker').selectpicker({
+            selectAllText: '<span class="text-success fs-18 border col-xs-12">هــمه</span>',
+            deselectAllText: '<span class="text-danger fs-18 border col-xs-12">هیــچکدام</span>',
+            showContent: "true",
+            liveSearchPlaceholder: "جستجوی کاربر ...",
+            container: "true",
+            countSelectedText: "{0} کاربر انتخاب شده",
+            showTick: "true",
+            tickIcon: "fa fa-check",
+            virtualScroll: "true",
+            noneResultsText: "<span class='text-danger'>کاربری یافت نشد !</span>"
+        });
+    </script>
+
+}
+else
+{
+    <div class="row">
+        <div class="container-fluid">
+            <h3 class="text-xs-center alert alert-info">گزارش کارمزد سازمان فروش ماه : @Model.Mounth سال : @Model.Year</h3>
+
+            <div class="col-xs-12">
+                <div class="col-md-4 col-xs-12">
+
+                </div>
+                <div class="col-md-4 col-xs-12 mb-1">
+                    <input class=" form-control text-xs-center" id="myInput" name="myInput" type="text" autofocus autocomplete="off" placeholder="جستجوی کاربر، شماره بیمه نامه، بیمه گذار و بیمه شده ...">
+
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <form action="WriteSOrgCommissionsExcelFile" method="post">
+                        <input type="hidden" asp-for="Year" />
+                        <input type="hidden" asp-for="Mounth" />
+                        @foreach (var u in Model.OrgUrIds)
+                        {
+                            <input type="hidden" name="OrgUrIds" value="@u" />
+                        }
+                        <button type="submit" class="pr-1 pl-1 float-xs-left btn btn-primary" title="ثبت فایل اکسل"><span class="fa fa-file-excel-o fs-16 yellow"></span></button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    double AllPTotalSum = 0; double AllOrgTotalSum = 0;
+    @foreach (var item in Model.OrgUserComVMs)
+    {
+        double PLifeComSum = 0; double PSupComSum = 0; double PTotalComSum = 0;
+
+        double OrgLifeCommisionSum = 0; double OrgSupCommisionSum = 0;
+        <div class="table-responsive mainDiv">
+            <div class="col-xs-12">
+                <h4 class="text-xs-center title alert alert-success">
+                    @item.UserRole.FullPro - کد : @item.UserRole.User.Code - ناظر : @item.UserRole.UserRoleParent?.FullPro
+                    | وضعیت : @if (item.UserRole.IsActive && item.UserRole.User.IsActive)
+                    {<span class="tag tag-success">فعال</span>}
+                    else
+                    { <span class="tag tag-danger">غیرفعال</span>}
+                </h4>
+            </div>
+
+            <div class="table-responsive p-1 col-xs-12">
+                <table class="table table-bordered table-striped sortable table-numberedRows fs-14">
+
+
+                    <thead>
+                        <tr>
+                            <td colspan="13" class="text-xs-center p-1 fs-24 font-weight-bold">کارمزد فروش مستقیم</td>
+                        </tr>
+                        <tr>
+
+                            <th class="text-xs-center align-middle p-0">شماره بیمه نامه</th>
+                            <th class="text-xs-center align-middle p-0">بیمه گذار</th>
+                            <th class="text-xs-center align-middle p-0">بیمه شده</th>
+                            <th class="text-xs-center align-middle p-0">تاریخ سررسید</th>
+                            <th class="text-xs-center align-middle p-0">تاریخ واریز</th>
+                            <th class="text-xs-center align-middle p-0">حق بیمه عمر</th>
+                            <th class="text-xs-center align-middle p-0">حق بیمه تکمیلی</th>
+                            <th class="text-xs-center align-middle p-0">مجموع حق بیمه</th>
+                            <th class="text-xs-center align-middle p-0">کارمزد عمر</th>
+                            <th class="text-xs-center align-middle p-0">کارمزد تکمیلی</th>
+                            <th class="text-xs-center align-middle p-0">مجموع کارمزد</th>
+                            <th class="text-xs-center align-middle p-0">درصد</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int radif = 1;
+                        }
+
+                        @foreach (var pCom in item.PersoanlCommissions)
+                        {
+                            DataLayer.Entities.LifeBordro.LifeBordroBase lifeBordroBase = await _bordroService.GetLifeBordroBaseById(pCom.LifeBordroBase.Id);
+                            DataLayer.Entities.LifeBordro.LifeBordroAddition ActiveAddition = lifeBordroBase.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true);
+                            <tr>
+
+                                <td class="text-xs-center align-middle fs-12 p-0 pr-1mm pl-1mm">@pCom.LifeBordroBase.InsNO</td>
+                                <td class="text-xs-center align-middle p-0">@ActiveAddition.InsurerFullName</td>
+                                <td class="text-xs-center align-middle p-0">@ActiveAddition.InsuredFullName</td>
+                                <td class="text-xs-center align-middle fs-12 p-0">@pCom.DueDate.ToShamsi()</td>
+                                <td class="text-xs-center align-middle fs-12 p-0">@pCom.PaidDate.ToShamsi()</td>
+                                <td class="text-xs-center align-middle p-0">@pCom.LifePremium.ToString("N0")</td>
+                                <td class="text-xs-center align-middle p-0">@pCom.SupPermium.ToString("N0")</td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+
+                                        long PremiumSum = pCom.LifePremium + pCom.SupPermium;
+                                    }
+                                    @PremiumSum.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        float NewPer = 0;
+                                        float per = 0;
+                                        long LifeCom = 0;
+                                        int loop = 1;
+                                        foreach (var up in ActiveAddition.SalesUsers.LastOrDefault().Split("-").ToList())
+                                        {
+
+                                            if (loop == 3)
+                                            {
+                                                per = float.Parse(up.ToString());
+                                            }
+
+                                            loop++;
+                                        }
+                                        NewPer = (per / pCom.Percent);
+                                        //NewPer = (float)Math.Round(NewPer, 2, MidpointRounding.ToNegativeInfinity);
+                                        LifeCom = (long)(NewPer * (pCom.LifeCommission * 100 / pCom.Percent));
+                                        PLifeComSum += LifeCom;
+                                    }
+
+                                    @LifeCom.ToString("N0")
+
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        long SupCom = 0;
+                                        SupCom = (long)(NewPer * (pCom.SupCommission * 100 / pCom.Percent));
+                                        PSupComSum += SupCom;
+                                    }
+                                    @SupCom.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        long CommissionSum = LifeCom + SupCom;
+                                        PTotalComSum += CommissionSum;
+
+                                    }
+                                    @CommissionSum.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @per
+                                </td>
+
+
+                            </tr>
+                            radif++;
+                        }
+                        <tr>
+                            <td colspan="4"></td>
+                            <td class="text-xs-center text-bold-900 p-0">جمع کل </td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@item.PersoanlCommissions.Sum(s => s.LifePremium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@item.PersoanlCommissions.Sum(s => s.SupPermium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@item.PersoanlCommissions.Sum(s => s.LifePremium + s.SupPermium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@PLifeComSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@PSupComSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@PTotalComSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">-</td>
+                            @{
+                                AllPTotalSum += PTotalComSum;
+                            }
+
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive p-1 col-xs-12">
+                <table class="table table-bordered table-striped sortable table-numberedRows fs-12 ComReport">
+
+                    <thead>
+                        <tr>
+                            <td colspan="13" class="text-xs-center p-1 fs-24 font-weight-bold">کارمزد فروش سازمانی</td>
+                        </tr>
+                        <tr>
+
+                            <th class="text-xs-center align-middle p-0">شماره بیمه نامه</th>
+                            <th class="text-xs-center align-middle p-0 ">نماینده</th>
+                            <th class="text-xs-center align-middle p-0">بیمه گذار</th>
+                            <th class="text-xs-center align-middle p-0">بیمه شده</th>
+                            <th class="text-xs-center align-middle p-0">تاریخ سررسید</th>
+                            <th class="text-xs-center align-middle p-0">تاریخ واریز</th>
+                            <th class="text-xs-center align-middle p-0">حق بیمه عمر</th>
+                            <th class="text-xs-center align-middle p-0">حق بیمه تکمیلی</th>
+                            <th class="text-xs-center align-middle p-0">مجموع حق بیمه</th>
+                            <th class="text-xs-center align-middle p-0">کارمزد عمر</th>
+                            <th class="text-xs-center align-middle p-0">کارمزد تکمیلی</th>
+                            <th class="text-xs-center align-middle p-0">مجموع کارمزد</th>
+                            <th class="text-xs-center align-middle p-0">درصد</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int radif2 = 1;
+
+                        }
+                        @foreach (var OrgCom in item.OrgCommissions)
+                        {
+                            DataLayer.Entities.LifeBordro.LifeBordroBase OrglifeBordroBase = await _bordroService.GetLifeBordroBaseById(OrgCom.LifeBordroBase.Id);
+                            DataLayer.Entities.LifeBordro.LifeBordroAddition OrgActiveAddition = OrglifeBordroBase.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true);
+
+                            float Orgper = 0;
+                            float Eqper = 0;
+                            int loop = 1;
+                            var su = OrgActiveAddition.SalesUsers.FirstOrDefault(a => a.Substring(0, a.IndexOf("-")) == item.UserRole.URId.ToString()).ToString();
+                            foreach (var up in su.Split("-").ToList())
+                            {
+                                if (loop == 3)
+                                {
+                                    Orgper = float.Parse(up.ToString());
+                                }
+                                if (loop == 4)
+                                {
+                                    Eqper = float.Parse(up.ToString());
+                                    Orgper += Eqper;
+                                }
+                                loop++;
+                            }
+                            var sux = OrgActiveAddition.SalesUsers.LastOrDefault();
+                            string urrid = sux.Split("-")[0].ToString();
+                            float TotalOrgPer = 0;
+                            DataLayer.Entities.User.UserRole SelleruserRole = null;
+                            if (!string.IsNullOrEmpty(urrid))
+                            {
+                                SelleruserRole = await _userService.GetUserRoleByIdAsync(int.Parse(urrid));
+                            }
+                            if (SelleruserRole != null)
+                            {
+                                TotalOrgPer = Orgper * SelleruserRole.Role.RoleRate;
+                            }
+
+                            <tr>
+
+                                <td class="text-xs-center align-middle p-0 pr-1mm pl-1mm">@OrgCom.LifeBordroBase.InsNO</td>
+                                <td class="text-xs-center align-middle p-0 ">@OrgActiveAddition.Seller</td>
+                                <td class="text-xs-center align-middle p-0">@OrgActiveAddition.InsurerFullName</td>
+                                <td class="text-xs-center align-middle p-0">@OrgActiveAddition.InsuredFullName</td>
+                                <td class="text-xs-center align-middle p-0">@OrgCom.DueDate.ToShamsi()</td>
+                                <td class="text-xs-center align-middle p-0">@OrgCom.PaidDate.ToShamsi()</td>
+                                <td class="text-xs-center align-middle p-0">@OrgCom.LifePremium.ToString("N0")</td>
+                                <td class="text-xs-center align-middle p-0">@OrgCom.SupPermium.ToString("N0")</td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        long PremiumSum = OrgCom.LifePremium + OrgCom.SupPermium;
+                                    }
+                                    @PremiumSum.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        double OrgLifeCommission = ((TotalOrgPer / OrgCom.Percent) * (OrgCom.LifeCommission * 100 / OrgCom.Percent));
+                                        OrgLifeCommission = (int)OrgLifeCommission;
+                                        OrgLifeCommisionSum += OrgLifeCommission;
+                                        long lngOrgLifeCommisson = (long)OrgLifeCommission;
+                                    }
+
+                                    @lngOrgLifeCommisson.ToString("N0")
+
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        double OrgSupCommission = ((TotalOrgPer / OrgCom.Percent) * (OrgCom.SupCommission * 100 / OrgCom.Percent));
+                                        OrgSupCommission = (int)OrgSupCommission;
+                                        OrgSupCommisionSum += OrgSupCommission;
+                                        long lngOrgSupCommission = (long)OrgSupCommisionSum;
+                                    }
+                                    @OrgSupCommission.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        long CommissionSum = lngOrgLifeCommisson + (long)OrgSupCommission;
+
+
+                                    }
+                                    @CommissionSum.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @if (Eqper == 0)
+                                    {
+                                        @Orgper
+                                    }
+                                    else
+                                    {
+                                        <span class="info"> @Orgper </span>
+                                    }
+
+
+                                </td>
+
+
+                            </tr>
+                            radif2++;
+                        }
+                        <tr>
+                            <td colspan="5"></td>
+                            <td class="text-xs-center text-bold-900 p-0">جمع کل </td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@item.OrgCommissions.Sum(s => s.LifePremium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@item.OrgCommissions.Sum(s => s.SupPermium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@item.OrgCommissions.Sum(s => s.LifePremium + s.SupPermium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@OrgLifeCommisionSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@OrgSupCommisionSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">
+                                @{
+                                    double TotalCommissionSum = OrgLifeCommisionSum + OrgSupCommisionSum;
+                                    AllOrgTotalSum += TotalCommissionSum;
+                                }
+                                @Math.Round(TotalCommissionSum, MidpointRounding.AwayFromZero).ToString("N0")
+                            </td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">-</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+
+    }
+    <div>
+        <p class="col-md-4 col-xs-12  m-t-2 text-xs-right"><span class="tag tag-info pl-1 pr-1">جمع کارمزدهای فروش مستقیم : @AllPTotalSum.ToString("N0")</span> </p>
+        <p class="col-md-4 col-xs-12  m-t-2 text-xs-center">
+            @{ 
+                double allTotal = AllPTotalSum + AllOrgTotalSum;
+            }
+            <span class="tag tag-warning black pl-1 pr-1">
+                جمع کارمزد پرداختی در سازمان
+                : @allTotal.ToString("N0")
+            </span>
+        </p>
+        <p class="col-md-4 col-xs-12 text-xs-left m-t-2"><span class="tag tag-success pl-1 pr-1">جمع کارمزدهای فروش سازمانی : @AllOrgTotalSum.ToString("N0")</span> </p>
+    </div>
+}
+@section Scripts{
+
+    <script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+            function jumpTo() {
+                if ($results.length) {
+                    var position,
+                        $current = $results.eq(currentIndex);
+                    $results.removeClass(currentClass);
+                    if ($current.length) {
+                        $current.addClass(currentClass);
+                        var parent = $current.closest('table')
+                        if (parent.length) {
+                            $('html').scrollTop(parent.offset().top - offsetTop)
+                            parent.scrollTop(parent.scrollTop() - parent.offset().top + $current.offset().top);
+                        }
+                        else {
+                            $('html').animate({
+                                scrollTop: $current.offset().top - offsetTop
+                            }, 300);
+                        }
+                    }
+                }
+            }
+
+            $("#myInput").keypress(function (e) {
+                if (e.keyCode === 13) {
+                    var $context = $(".mainDiv h4, .mainDiv table tr");
+                    console.log($context);
+                    $(".mainDiv").show().unmark();
+                    $(".pm").remove();
+                    var term = $("#myInput").val();
+
+                    if (term) {
+                        $context.mark(term, {
+                            "className": "bg-warning",
+                            "separateWordSearch": true,
+                            "accuracy": "complementary",
+                            "noMatch": function () {
+                                $("#myInput").after("<br /><span class='col-xs-12 fs-18 text-xs-center pm red m-t-5'>موردی یافت نشد</span>");
+                            },
+                            done: function (counter) {
+                                $("#myInput").after("<br /><span class='col-xs-12 fs-18 text-xs-center pm red m-t-5'>" + counter + " " + "مورد پیدا شده است !" + "</span>");
+                                $(".mainDiv ").not(":has(mark)").hide();
+
+                            }
+                        });
+                    }
+
+                }
+            });
+
+
+            $("#btnExport").click(function () {
+                var d = new Date();
+                var t = "Y" + d.getFullYear() + "M" + d.getMonth() + "D" + d.getDay() + "H" + d.getHours() + "M" + d.getMinutes() + "S" + d.getSeconds();
+                $("#tblUsers").table2excel({
+                    filename: "Table" + t
+                });
+            });
+
+
+        });
+
+    </script>
+
+}

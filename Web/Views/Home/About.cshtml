@@ -1,0 +1,160 @@
+﻿@using Core.Services.Interfaces;
+@inject IBordroService _bordroService
+@inject IUserService _userService;
+@{
+    ViewData["Title"] = "درباره ما";
+    @section MetaTagDescription{
+        <meta content="آشنایی بیشتر با تاریخچه سازمان فروش بیمه پاسارگاد و دستاوردهای این سازمان" name="descriptison">
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    double portfo = _bordroService.GetLifeBordroBases().SelectMany(s => s.LifeBordroAdditions).Where(w => w.IsActive == true).Sum(x => x.PremiumbyPaymentMethod);
+    double portfoTarget = 10000000000000;
+    portfo += 5000000000000;
+    double percent = Math.Round(portfo / portfoTarget, 2);
+    percent *= 100;
+
+    double InsCount = _bordroService.GetLifeBordroBases().Count();
+    double InsTarget = 1000000;
+    InsCount += 430000;
+    double InsPercent = Math.Round(InsCount / InsTarget, 2);
+    InsPercent *= 100;
+
+    double OrgRegCount = _userService.GetUserRoles().Result.Where(w => w.User.IsActive == true).Count();
+    double OrgRegTarget = 10000;
+    OrgRegCount += 3000;
+    decimal OrgRegPercent = (decimal)Math.Round(OrgRegCount / OrgRegTarget, 2);
+    OrgRegPercent *= 100;
+    int intOrgRegPercent = (int)OrgRegPercent;
+
+    DateTime StartDate = new DateTime(2007, 7, 2);
+    double LongTimeDay = (DateTime.Now - StartDate).TotalDays;
+    LongTimeDay = Math.Round(LongTimeDay, 0);
+    //decimal LongTime = 47450;
+
+    double OrgRegManagerCount = _userService.GetUserRoles().Result.Where(w => w.User.IsActive == true && (w.RoleId >= 5 && w.RoleId <= 8)).Count();
+    double OrgRegManagerCountTarget = 1000;
+    OrgRegManagerCount += 276;
+    decimal OrgRegManagerPercent = (decimal)Math.Round(OrgRegManagerCount / OrgRegManagerCountTarget, 2);
+    OrgRegManagerPercent *= 100;
+    int intOrgRegManagerPercent = (int)OrgRegManagerPercent;
+}
+@section HeaderBlack{
+    @(await Component.InvokeAsync("HeaderBlack"))
+}
+
+<!-- ======= About Us Section ======= -->
+<section class="breadcrumbs">
+    
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center pl-2">
+                <h2>درباره ما</h2>
+                <ol>
+                    <li><a href="/">پاسارگاد</a></li>
+                    <li>درباره ما</li>
+                </ol>
+            </div>
+
+        </div>
+   
+    
+</section><!-- End About Us Section -->
+<!-- ======= About Section ======= -->
+<section class="about" data-aos="fade-up">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-6 card no-border text-center col-xs-12 pt-1">
+                <img src="~/images/pasargadbuilding450450.jpg" class="img-fluid rounded" />
+            </div>
+            <div class="col-md-6 col-xs-12 pt-4 pt-lg-0 text-right">
+                <h3 class="text-justify m-b-10">درباره سازمان فروش شرکت بیمه پاسارگاد</h3>
+                <p class="text-justify line-height-1">
+                    پس از تاسیس شرکت بیمه پاسارگاد و با هدف عرضه گسترده خدمات بیمه ای بویژه در حوزه بیمه های زندگی اولین و بزرگترین سازمان تخصصی فروش خدمات بیمه ای کشور پا به عرصه صنعت بیمه ایران گذاشت. این سازمان با چشم انداز ارائه مشاوره فرد به فرد به هموطنان در راستای تهیه بهترین خدمات بیمه ای متناسب با نیاز هر فرد فعالیت رسمی خود را در سال 1388آغاز نمود. امروز بیمه پاسارگاد با دارا بودن ارکان ویژه مدیریت و فروش بیمه های زندگی تحت عناوین مدیرارشد، مدیرتوسعه، مدیرآموزش، مدیرفروش، سرپرست فروش و نماینده فروش بیمه زندگی به عنوان بزرگترین و تنها دارنده سازمان تخصصی فروش بیمه در کشور شناخته شده و با بیش از 25000 نماینده و مدیرسازمانی توانسته است بیش از 5 میلیون نفر از هموطنان را تحت پوشش بیمه زندگی قرارداده و عنوان بزرگترین شرکت فعال در حوزه بیمه زندگی کشور را از آن خود نماید.
+                </p>
+
+            </div>
+        </div>
+
+    </div>
+</section><!-- End About Section -->
+<!-- ======= Facts Section ======= -->
+<section class="facts section-bg" data-aos="fade-up">
+    <div class="container">
+
+        <div class="row counters">
+
+            <div class="col-lg-3 col-6 text-center fs-10">
+                @{
+                    double Sportfo = portfo / 1000000;
+                    Sportfo = Math.Round(Sportfo, 0);
+
+                }
+                <span data-toggle="counter-up"> @Sportfo </span> <span class="fs-10">میلیون</span>
+                <p>پورتفوی تولیدی</p>
+            </div>
+
+            <div class="col-lg-3 col-6 text-center">
+
+                <span data-toggle="counter-up">@InsCount</span> <span>نفر</span>
+                <p>بیمه شده</p>
+            </div>
+
+            <div class="col-lg-3 col-6 text-center">
+                <span data-toggle="counter-up">@OrgRegCount</span><span>نفر</span>
+                <p>سازمان فروش</p>
+            </div>
+
+            <div class="col-lg-3 col-6 text-center">
+                <span data-toggle="counter-up">@LongTimeDay</span><span>روز</span>
+                <p>خدمتگزاری</p>
+            </div>
+
+        </div>
+
+    </div>
+</section><!-- End Facts Section -->
+<!-- ======= Our Skills Section ======= -->
+<section class="skills fs-16" data-aos="fade-up">
+    <div class="container">
+
+        <div class="section-title">
+            <h2>اهداف ما</h2>
+            <p>
+                امروز بیمه پاسارگاد با فراگیر ترین سازمان فروش بیمه های زندگی در کشور سهم عمده این بازار را در اختیار دارد و با بیش از 5 میلیون بیمه نامه صادره به عنوان بزرگترین شرکت فعال در حوزه بیمه های زندگی کشور شناخته می شود که نشان از عزم جدی و برنامه ریزی هدفمند شرکت در ایفای نقش محوری خود در این حوزه دارد. ما در این مسیر اهداف بزرگی پیش روی خود ترسیم نموده ایم و با عزمی راسخ برای تحقق این اهداف گام برمی داریم.
+            </p>
+        </div>
+
+        <div class="skills-content">
+
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
+                    <span class="skill"> پورتفوی تولیدی <i class="val">% @percent</i> </span>
+                </div>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar bg-info" role="progressbar" aria-valuenow="@InsPercent" aria-valuemin="0" aria-valuemax="100">
+                    <span class="skill">تعداد بیمه شدگان <i class="val">% @InsPercent</i></span>
+                </div>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="@OrgRegPercent" aria-valuemin="0" aria-valuemax="100">
+                    <span class="skill">سازمان فروش <i class="val">% @intOrgRegPercent</i></span>
+                </div>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="@OrgRegManagerPercent" aria-valuemin="0" aria-valuemax="100">
+                    <span class="skill">مدیران سازمانی <i class="val">% @intOrgRegManagerPercent</i></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section><!-- End Our Skills Section -->
+
+@section Footer{
+    @(await Component.InvokeAsync("Footer"))
+}

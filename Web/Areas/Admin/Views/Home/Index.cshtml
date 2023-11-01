@@ -1,0 +1,551 @@
+﻿@model Core.DTOs.General.AdminIndexModel;
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+
+@inject IUserService _userService;
+@{
+    ViewData["Title"] = "پنل مدیریت";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    System.Globalization.PersianCalendar PC = new System.Globalization.PersianCalendar();
+    var chartLabels = Newtonsoft.Json.JsonConvert.SerializeObject(Model.SimplePieChartModel.Labels.ToList());
+    var chartdata = Newtonsoft.Json.JsonConvert.SerializeObject(Model.SimplePieChartModel.Data.ToList());
+    var bgcolors = Newtonsoft.Json.JsonConvert.SerializeObject(Model.SimplePieChartModel.BgColors.ToList());
+
+    var BrchartLabels = Newtonsoft.Json.JsonConvert.SerializeObject(Model.BranchesDistChart.Labels.ToList());
+    var Brchartdata = Newtonsoft.Json.JsonConvert.SerializeObject(Model.BranchesDistChart.Data.ToList());
+    var brbgColors = Newtonsoft.Json.JsonConvert.SerializeObject(Model.BranchesDistChart.BgColors.ToList());
+
+
+    var columnLabels = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ColumnChartModel.Labels.ToList());
+    var columnDatasets = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ColumnChartModel.ColumnDatasetModels.ToList(), Newtonsoft.Json.Formatting.Indented);
+
+    var columndata1 = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ColumnChartModel.data1);
+    var columndata2 = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ColumnChartModel.data2);
+
+    List<DataLayer.Entities.User.UserRole> userRoles = await _userService.GetUserRolesByUserCode(User.Identity.Name);
+    DataLayer.Entities.User.UserRole ActiveUserRole = userRoles.FirstOrDefault(f => f.IsActive == true);
+}
+
+<!-- stats -->
+<div class="row">
+    <div class="col-xl-3 col-lg-6 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-block">
+                    <div class="media">
+                        <div class="media-body text-xs-left">
+                            <h5 class="pink text-xs-center height-50-per">@Model.SalesOrgCount</h5>
+                            <span class="col-xs-12 fs-14 text-xs-center"> سازمان فروش</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-group pink font-large-2 float-xs-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-block">
+                    <div class="media">
+                        <div class="media-body text-xs-left">
+                            <h5 class="teal height-50-per text-xs-center">@Model.DirectSalesValue.ToString("N0")</h5>
+                            <span class="col-xs-12 fs-14 text-xs-center">فروش مستقیم</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-user teal font-large-2 float-xs-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-block">
+                    <div class="media">
+                        <div class="media-body text-xs-left pr-0">
+                            <h5 class="deep-orange height-50-per text-xs-center">@Model.IndirectSalesValue.ToString("N0")</h5>
+                            <span class="col-xs-12 fs-14 text-xs-center">فروش سازمانی</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-world deep-orange font-large-2 float-xs-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-block">
+                    <div class="media">
+                        <div class="media-body text-xs-left">
+                            <h5 class="cyan height-50-per text-xs-center">@Model.LastCommissionValue.ToString("N0")</h5>
+                            <span class="text-xs-center fs-14 col-xs-12">آخرین کارمزد</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-money1 cyan font-large-2 float-xs-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ stats -->
+<!--/ project charts -->
+<div class="row">
+    <div class="col-xl-8 col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-inline text-xs-center pt-2 m-0">
+                    <li class="mr-1">
+                        <h6><i class="icon-circle warning"></i> <span class="grey darken-1">آمار</span></h6>
+                    </li>
+                    <li class="mr-1">
+                        <h6><i class="icon-circle success"></i> <span class="grey darken-1">پورتفوی</span></h6>
+                    </li>
+                </ul>
+                <div class="chartjs height-250">
+                    <canvas id="line-stacked-area" height="250"></canvas>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-xs-3 text-xs-center">
+                        <span class="text-muted">زیر مجموعه</span>
+                        <h2 class="block font-weight-normal">0</h2>
+                        <progress class="progress progress-xs mt-2 progress-success" value="70" max="100"></progress>
+                    </div>
+                    <div class="col-xs-3 text-xs-center">
+                        <span class="text-muted">فروش مستقیم</span>
+                        <h2 class="block font-weight-normal">0</h2>
+                        <progress class="progress progress-xs mt-2 progress-success" value="40" max="100"></progress>
+                    </div>
+                    <div class="col-xs-3 text-xs-center">
+                        <span class="text-muted">فروش سازمانی</span>
+                        <h2 class="block font-weight-normal">0</h2>
+                        <progress class="progress progress-xs mt-2 progress-success" value="60" max="100"></progress>
+                    </div>
+                    <div class="col-xs-3 text-xs-center">
+                        <span class="text-muted">آخرین کارمزد</span>
+                        <h2 class="block font-weight-normal">ریال 0</h2>
+                        <progress class="progress progress-xs mt-2 progress-success" value="90" max="100"></progress>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-lg-12">
+        <div class="card card-inverse bg-info height-450">
+            <div class="card-body">
+                <div class="position-relative">
+                    @{
+                        (int StCount, long PortValue, string rateTitle) NextSt = await _userService.GetUserHigherRankInfo(ActiveUserRole.URId);
+                    }
+                    <div class="chart-title col-xs-12  mt-2  m-b-10">
+                        <h5 class="text-xs-center w-100 bg-white p-t-10 p-b-10 rounded">فاصله تا رتبه @Html.Raw(NextSt.rateTitle)</h5>
+
+                    </div>
+
+
+                    <div class="height-150 ">
+                        <div class="col-md-8 col-xs-12">
+                            <p class="text-xs-center  border-bottom-white yellow">پورتفوی مورد نیاز</p>
+                            <p class="text-xs-center  text-danger p-0"><span class="fs-18 p-0 font-weight-bold">&dArr;</span> </p>
+                            <p class="text-xs-center white fs-24 p-b-0"><span class="border-bottom">@NextSt.PortValue.ToString("N0")</span></p>
+                            <p class="text-xs-center">ریال</p>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <p class="text-xs-center border-bottom-white yellow">آمار مورد نیاز</p>
+                            <p class="text-xs-center text-danger p-0"><span class="fs-18 p-0 font-weight-bold">&dArr;</span> </p>
+                            <p class="text-xs-center white fs-24 p-b-0"><span class="border-bottom">@NextSt.StCount.ToString("N0")</span></p>
+                            <p class="text-xs-center ">عدد</p>
+                        </div>
+
+                    </div>
+
+                    <svg height="70"  class="w-100 hidden-md-down m-b-20" >
+                        <path d="M 0 40 C 100 0, 110 40, 190 40 S 250 90, 400 40" stroke="yellow" stroke-width="5" fill="transparent" />
+                        
+                    </svg>
+                    <br class="white hidden-xl-up" />
+                    <div class="col-xs-12 m-t-10">
+                        @{
+                            float nonePay_ratio = 0;
+                            if(Model.TotalBorderoesCount != 0)
+                            {
+                                nonePay_ratio = (float)Model.NonePaymentBordroesCount / Model.TotalBorderoesCount;
+                            }
+
+                            float pay_ratio = 1 - nonePay_ratio;
+                            float intPay_ratio = (pay_ratio * 100);
+                        }
+                        <p class="fs-24 text-xs-center  m-b-5 p-t-2 p-b-2 bg-white rounded">
+                            @if (intPay_ratio >= 70)
+                            {
+                                <span class="fs-32 success">@intPay_ratio.ToString("N2")</span>
+                            }
+                            else
+                            {
+                                <span class="fs-32 danger">@intPay_ratio.ToString("N2")</span>
+                            }
+                            <span class="fs-14">%</span>
+                        </p>
+                        <p class="text-xs-center hidden-md-down white">نسبت وصول</p>
+                        <p class="text-xs-center hidden-sm-up green">نسبت وصول</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ project charts -->
+<!-- Recent invoice with Statistics -->
+<div class="row match-height">
+    <div class="col-xl-4 col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="media">
+                    <div class="p-2 text-xs-center bg-deep-orange media-left media-middle">
+                        <i class="icon-user-plus font-large-2 white"></i>
+                    </div>
+                    <div class="p-2 media-body">
+                        <h5 class="deep-orange">همکاران جدید ماه</h5>
+                        <h5 class="text-bold-400">@Model.CurrentMounthRegUserCount</h5>
+                        @*<progress class="progress progress-sm progress-deep-orange mt-1 mb-0" value="45" max="100"></progress>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="media">
+                    <div class="p-2 text-xs-center bg-green media-left media-middle">
+                        <i class="icon-money3 font-large-2 white"></i>
+                    </div>
+                    <div class="p-2 media-body">
+                        <h5 class="green">فروش مستقیم هفته</h5>
+                        <h5 class="text-bold-400">@Model.CurrentWeekDirectSalesValue.ToString("N0")</h5>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="media">
+                    <div class="p-2 text-xs-center bg-cyan media-left media-middle">
+                        <i class="icon-money4 font-large-2 white"></i>
+                    </div>
+                    <div class="p-2 media-body">
+                        <h5>فروش سازمانی هفته</h5>
+                        <h5 class="text-bold-400">@Model.CurrentWeekInDirectSalesValue.ToString("N0")</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-xl-8 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">بیمه نامه های اخیر</h4>
+                <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
+                <div class="heading-elements">
+                    <ul class="list-inline mb-0">
+                        <li><a data-action="reload"><i class="icon-reload"></i></a></li>
+                        <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="card-block">
+                    <p class="text-xs-center"><span><a href="/Admin/BordroReports/LifeInsurances">مستقیم : @Model.DirectSalesCount</a></span> | <span><a href="/Admin/BordroReports/OrgLifeInsurances">سازمانی : @Model.IndirectSalesCount</a></span> </p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 fs-13 ">
+                        <thead>
+                            <tr>
+                                <th class="text-xs-center align-middle p-0">#</th>
+                                <th class="text-xs-center align-middle p-0" title="شماره بیمه نامه">ش.ب</th>
+                                <th class="text-xs-center align-middle p-0">بیمه شده</th>
+                                <th class="text-xs-center align-middle p-0">بیمه گذار</th>
+                                <th class="text-xs-center align-middle p-0">تاریخ صدور</th>
+                                <th class="text-xs-center align-middle p-0">حق بیمه</th>
+                                <th class="text-xs-center align-middle p-0">عامل فروش</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int rad = 1;}
+                            @foreach (var Allb in Model.Last10Bordroes)
+                            {
+                                <tr>
+                                    <td class="text-truncate text-xs-center p-0">@rad</td>
+                                    <td class="text-truncate text-xs-center p-0">@Allb.InsNO</td>
+                                    <td class="text-truncate text-xs-center p-0">@Allb.LifeBordroAdditions.FirstOrDefault(f => f.IsActive).InsuredFullName</td>
+                                    <td class="text-truncate text-xs-center p-0">@Allb.LifeBordroAdditions.FirstOrDefault(f => f.IsActive).InsurerFullName</td>
+                                    <td class="text-truncate text-xs-center p-0">@Allb.IssueDate.ToShamsi()</td>
+                                    <td class="text-truncate text-xs-center p-0">@Allb.LifeBordroAdditions.FirstOrDefault(f => f.IsActive).PremiumbyPaymentMethod.ToString("N0")</td>
+                                    <td class="text-truncate text-xs-center p-0">@Allb.LifeBordroAdditions.FirstOrDefault(f => f.IsActive).Seller</td>
+                                </tr>
+                                rad++;
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section id="chartjs-pie-charts">
+    <div class="row">
+        <div class="col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">توزیع آمار شعب صدور</h4>
+                    <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
+                    <div class="heading-elements">
+                        <ul class="list-inline mb-0">
+                            <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
+                            <li><a data-action="reload"><i class="icon-reload"></i></a></li>
+                            <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
+                            <li><a data-action="close"><i class="icon-cross2"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body collapse in" dir="rtl">
+                    <div class="card-block">
+                        <canvas id="BrPieChart" dir="rtl" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simple Doughnut Chart -->
+        <div class="col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">توزیع استانی سازمان فروش</h4>
+                    <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
+                    <div class="heading-elements">
+                        <ul class="list-inline mb-0">
+                            <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
+                            <li><a data-action="reload"><i class="icon-reload"></i></a></li>
+                            <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
+                            <li><a data-action="close"><i class="icon-cross2"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body collapse in">
+                    <div class="card-block">
+                        <canvas id="simplepie-distributionSaleOrg" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+<!-- Column Chart -->
+<div class="row">
+    <div class="col-xs-12">
+        <div class="card">
+            <div class="card-header">
+                @{
+                    string Sname = Core.Utility.MyUtility.GetCurrentSeason(DateTime.Now);
+                }
+                <h4 class="card-title">ترکیب جنسیتی سازمان فروش در فصل @Sname</h4>
+                <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
+                <div class="heading-elements">
+                    <ul class="list-inline mb-0">
+                        <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
+                        <li><a data-action="reload"><i class="icon-reload"></i></a></li>
+                        <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
+                        <li><a data-action="close"><i class="icon-cross2"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body collapse in">
+                <div class="card-block">
+                    <canvas id="column-chart" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+
+
+    <script>
+
+
+       $(window).on("load", function(){
+           var ctxBrPie = $("#BrPieChart");
+
+           // Chart Options
+           var BrchartOptions = {
+               responsive: true,
+               maintainAspectRatio: false,
+               responsiveAnimationDuration: 500,
+               legend: {
+                   position: 'right',
+               },
+           };
+
+           // Chart Data
+            var BrchartData = {
+                labels:@Html.Raw(BrchartLabels),
+                datasets: [{
+                    label: "My First dataset",
+                    data: @Html.Raw(Brchartdata),
+                    backgroundColor: @Html.Raw(brbgColors),
+                }]
+           };
+           var Brconfig = {
+               type: 'doughnut',
+               // Chart Options
+               options: BrchartOptions,
+               data: BrchartData,
+               align: "end"
+           };
+           // Create the chart
+           var BrPieChart = new Chart(ctxBrPie, Brconfig);
+
+           //======================
+            //Get the context of the Chart canvas element we want to select
+             var ctx = $("#simplepie-distributionSaleOrg");
+
+            // Chart Options
+            var chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                responsiveAnimationDuration: 500,
+                legend: {
+                    //display : false,
+                    position: 'right',
+                    
+                   
+                },
+            };
+
+            // Chart Data
+            var chartData = {
+                labels:@Html.Raw(chartLabels),
+                datasets: [{
+                    label: "My First dataset",
+                    data: @Html.Raw(chartdata),
+                    backgroundColor: @Html.Raw(bgcolors),
+                }]
+            };
+
+                var config = {
+                    type: 'pie',
+                    // Chart Options
+                    options : chartOptions,
+                    data: chartData,
+
+                };
+                // Create the chart
+           new Chart(ctx, config);
+
+
+           //Get the context of the Chart canvas element we want to select
+           var cotx = $("#column-chart");
+
+           // Chart Options
+           var chartOptions2 = {
+               // Elements options apply to all of the options unless overridden in a dataset
+               // In this case, we are setting the border of each bar to be 2px wide and green
+               elements: {
+                   rectangle: {
+                       borderWidth: 2,
+                       borderColor: 'rgb(0, 255, 0)',
+                       borderSkipped: 'bottom'
+                   }
+               },
+               responsive: true,
+               maintainAspectRatio: false,
+               responsiveAnimationDuration: 500,
+               legend: {
+                   position: 'top',
+               },
+               scales: {
+                   xAxes: [{
+                       display: true,
+                       gridLines: {
+                           color: "#f3f3f3",
+                           drawTicks: false,
+                       },
+                       scaleLabel: {
+                           display: true,
+                       }
+                   }],
+                   yAxes: [{
+                       display: true,
+                       gridLines: {
+                           color: "#f3f3f3",
+                           drawTicks: false,
+                       },
+                       scaleLabel: {
+                           display: true,
+                       }
+                   }]
+               },
+               title: {
+                   display: false,
+                   text: 'ترکیب جنسیتی سازمان در فصل جاری'
+               }
+           };
+
+           // Chart Data
+           var chartData2 = {
+               labels: @Html.Raw(columnLabels),
+               datasets: [{
+            label: "مرد",
+            data: @Html.Raw(columndata1),
+            backgroundColor: "#673AB7",
+            hoverBackgroundColor: "rgba(103,58,183,.9)",
+            borderColor: "transparent"
+        }, {
+            label: "زن",
+            data: @Html.Raw(columndata2),
+            backgroundColor: "#E91E63",
+            hoverBackgroundColor: "rgba(233,30,99,.9)",
+            borderColor: "transparent"
+        }]
+           };
+        var colData = @Html.Raw(columnDatasets);
+           var config2 = {
+               type: 'bar',
+
+               // Chart Options
+               options: chartOptions2,
+
+               data: chartData2
+           };
+
+           // Create the chart
+           var lineChart = new Chart(cotx, config2);
+
+
+    });
+    </script>
+
+
+
+
+}
+
+
+

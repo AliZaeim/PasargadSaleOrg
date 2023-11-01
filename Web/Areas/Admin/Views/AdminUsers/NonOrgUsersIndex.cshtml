@@ -1,0 +1,89 @@
+﻿@model IEnumerable<DataLayer.Entities.User.UserRole>
+@using Core.Convertors; 
+@{
+    ViewData["Title"] = "کاربران سیستم به جز سازمان فروش";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">کاربران سیستم به جز سازمان فروش</h2>
+
+<p>
+    <a asp-action="CreateNonOrgUser">ثبت کاربر جدید</a>
+</p>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.RegisterDate)
+            </th>
+
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.User.FName)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.User.LName)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.User.NC)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.User.Cellphone)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.Role.RoleTitle)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th class="text-xs-center align-middle p-0">
+                @Html.DisplayNameFor(model => model.User.IsActive)
+            </th>
+            
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td class="text-xs-center align-middle p-0">
+                @item.RegisterDate.ToShamsiWithTime()
+            </td>
+            <td class="text-xs-center align-middle p-0">
+                @Html.DisplayFor(modelItem => item.User.FName)
+            </td>
+            <td class="text-xs-center align-middle p-0">
+                @Html.DisplayFor(modelItem => item.User.LName)
+            </td>
+            <td class="text-xs-center align-middle p-0">
+                @Html.DisplayFor(modelItem => item.User.NC)
+            </td>
+            <td class="text-xs-center align-middle p-0">
+                @Html.DisplayFor(modelItem => item.User.Cellphone)
+            </td>
+            <td class="text-xs-center align-middle p-0">
+                @Html.DisplayFor(modelItem => item.Role.RoleTitle)
+            </td>
+            <td class="text-xs-center align-middle p-0">
+                @if (item.IsActive)
+                {
+                    <span class="text-success">فعال</span>
+                }
+                else
+                {
+                    <span class="text-danger">غیرفعال</span>
+                }
+            </td>
+            <td class="text-xs-center align-middle p-0">
+                @if (item.User.IsActive)
+                {
+                    <span class="text-success">فعال</span>
+                }
+                else
+                {
+                    <span class="text-danger">غیرفعال</span>
+                }
+            </td>
+            
+        </tr>
+}
+    </tbody>
+</table>

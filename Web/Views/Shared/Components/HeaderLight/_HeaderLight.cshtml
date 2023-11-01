@@ -1,0 +1,42 @@
+﻿<!-- ======= Header ======= -->
+<header id="header" class="fixed-top header-transparent">
+    <div class="container">
+
+        <div class="logo float-right">
+
+            <h1 class="text-light">
+                
+                <a href="/"><img src="~/images/logo/mplogo.png" alt="" class="img-fluid"></a>
+                <a class="ztitle" href="/">
+                    <span>پرتال گزارشات سازمان فروش</span>
+                </a>
+            </h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+
+        </div>
+
+        <nav class="nav-menu float-left d-none d-lg-block">
+            <ul>
+                <li class="active" id="zhome"><a href="/">خانه <i class="la la-angle-down"></i></a></li>
+                <li><a href="/About">درباره ما</a></li>
+                <li><a href="/News">اخبار</a></li>
+                <li><a href="/Contact">تماس با ما</a></li>
+
+
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li><a href="/Admin" title="@User.Identity.Name">کاربری</a></li>
+                    <li><a href="/Logout">خروج</a></li>
+                }
+                else
+                {
+                    <li><a href="/Register">ثبت نام</a></li>
+                    <li><a href="/Login">ورود</a></li>
+                }
+            </ul>
+        </nav><!-- .nav-menu -->
+
+    </div>
+</header><!-- End Header -->
+<!-- ======= Hero Section ======= -->

@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-180920587-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-180920587-1');
+    </script>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>@ViewData["Title"]</title>
+    @RenderSection("MetaTagDescription", false)
+
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/favicon.png" rel="icon">
+    <link href="~/LayoutRef/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+
+    <link href="~/LayoutRef/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/LayoutRef/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/LayoutRef/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="~/LayoutRef/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/LayoutRef/vendor/venobox/venobox.css" rel="stylesheet">
+
+    <link href="~/LayoutRef/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet" />
+    <link href="~/LayoutRef/vendor/aos/aos.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="~/LayoutRef/css/style.css" rel="stylesheet">
+
+    <meta name="author" content="Ali Asle Zaeim">
+
+    <meta name="google-site-verification" content="2qn4pwDMQ3fkZ71Nq2_pgWkIAQ9ulcCZ86bnZUCBQcI" />
+
+</head>
+
+<body dir="rtl">
+    
+    @RenderSection("HeaderLight", false)
+    @RenderSection("HeaderBlack", false)
+    @RenderSection("Slider", false)
+
+    <main id="main">
+        @RenderBody()
+
+        <!-- ======= Services Section ======= -->
+        @RenderSection("Services", false)
+        <!-- End Services Section -->
+        <!-- ======= Why Us Section ======= -->
+        @RenderSection("SelectedNews", false)
+        <!-- End Why Us Section -->
+        <!-- ======= Features Section ======= -->
+        @RenderSection("Features", false)
+        <!-- End Features Section -->
+
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    @RenderSection("Footer", false)
+    <!-- End Footer -->
+
+    <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="~/LayoutRef/vendor/jquery/jquery.min.js"></script>
+    <script src="~/LayoutRef/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/LayoutRef/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="~/LayoutRef/vendor/php-email-form/validate.js"></script>
+    <script src="~/LayoutRef/vendor/venobox/venobox.min.js"></script>
+    <script src="~/LayoutRef/vendor/waypoints/jquery.waypoints.min.js"></script>
+    <script src="~/LayoutRef/vendor/counterup/counterup.min.js"></script>
+    <script src="~/LayoutRef/vendor/owl.carousel/owl.carousel.min.js"></script>
+    <script src="~/LayoutRef/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/LayoutRef/vendor/aos/aos.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="~/LayoutRef/js/main.js"></script>
+    <script>
+        $(function () {
+            // this will get the full URL at the address bar
+            var url = window.location.href;
+            $("#zhome").removeClass('active');
+            $(".nav-menu a").each(function () {
+                // checks if its the same on the address bar
+                if (url == (this.href)) {
+                    $(this).parent().closest('li').addClass('active');
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

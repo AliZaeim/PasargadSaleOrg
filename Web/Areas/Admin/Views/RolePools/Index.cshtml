@@ -1,0 +1,150 @@
+﻿@model IEnumerable<DataLayer.Entities.User.RolePool>
+@using Core.Services.Interfaces;
+@using DataLayer.Entities.ComplementaryInfo;
+@using Core.Convertors;
+@inject IUserService userService
+@{
+    ViewData["Title"] = "پاداشهای استخر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">پاداشهای استخر</h2>
+@if (userService.CheckPermissionByNameAsync(75, User.Identity.Name))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success">ثبت پاداش</a>
+    </p>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.Value)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.Type)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.Symbol)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.Percent)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.ByDirectSale)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.ByIndirectSale)
+                </th>
+
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.Role)
+                </th>
+                <th class="text-xs-center align-middle">
+                    سابقه تغییرات
+                </th>
+                <th class="text-xs-center align-middle">عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr>
+                <td class="text-xs-center align-middle p-0">
+                    @item.Value.ToString("N0")
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @Html.DisplayFor(modelItem => item.Symbol)
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @Html.DisplayFor(modelItem => item.Percent)
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @if((bool)item.ByDirectSale==true)
+                    {
+                        <span class="fa fa-check"></span>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @if ((bool)item.ByIndirectSale == true)
+                    {
+                        <span class="fa fa-check"></span>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @Html.DisplayFor(modelItem => item.Role.RoleTitle)
+                </td>
+
+                <td class="text-xs-right align-middle p-1">
+                    @{
+                        List<ChangeLog> rec = await userService.GetRecordUpdateLogs(item.Id, "RolePool");
+                    }
+
+                    @if (rec != null)
+                    {
+
+                        @if (rec.Count() != 0)
+                        {
+                            <span class="fa fa-eye-slash cursor-pointer zeye w-100 text-xs-center" title="مشاهده"></span>
+                            int rd = 1;
+                            foreach (var r in rec.OrderByDescending(r => r.DateChanged))
+                            {
+                                <div class="updlist hidden">
+                                    @foreach (var t in r.DescriptionList)
+                                    {
+                                        if (!string.IsNullOrEmpty(t))
+                                        {
+                                            <p>@rd - @t</p>
+                                            rd++;
+                                        }
+
+                                    }
+                                    <p class="text-info text-xs-center">@r.DateChanged.ToShamsiWithTime()</p>
+                                    <hr />
+                                </div>
+
+
+                            }
+                        }
+                        else
+                        {
+                            <span class="col-xs-12 text-xs-center">-</span>
+                        }
+
+                    }
+                    else
+                    {
+                        <span class="col-xs-12 text-xs-center">-</span>
+                    }
+                </td>
+                <td class="text-xs-center align-middle p-0">
+                    @if (userService.CheckPermissionByNameAsync(76, User.Identity.Name))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">ویرایش</a> <span>|</span>
+                    }
+                    @if (userService.CheckPermissionByNameAsync(78, User.Identity.Name))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id">حذف</a>
+                    }
+
+
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

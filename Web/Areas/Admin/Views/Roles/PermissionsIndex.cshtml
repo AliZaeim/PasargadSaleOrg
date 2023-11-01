@@ -1,0 +1,123 @@
+﻿@model IEnumerable<DataLayer.Entities.Permissions.Permission>
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@{
+    ViewData["Title"] = "دسترسی ها";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style type="text/css">
+    .just-padding {
+        padding: 15px;
+    }
+
+    .list-group.list-group-root {
+        padding: 0;
+        overflow: hidden;
+    }
+
+        .list-group.list-group-root .list-group {
+            margin-bottom: 0;
+        }
+
+        .list-group.list-group-root .list-group-item {
+            border-radius: 0;
+            border-width: 1px 0 0 0;
+        }
+
+        .list-group.list-group-root > .list-group-item:first-child {
+            border-top-width: 0;
+        }
+
+        .list-group.list-group-root > .list-group > .list-group-item {
+            padding-left: 30px;
+        }
+
+        .list-group.list-group-root > .list-group > .list-group > .list-group-item {
+            padding-left: 45px;
+        }
+
+    .list-group-item .glyphicon {
+        margin-right: 5px;
+    }
+</style>
+
+<div>
+    <h1 class="alert alert-info text-xs-center">
+        <span>لیست دسترسی ها</span>
+        <a href="~/Admin/Roles/Index" class="float-xs-left text-danger">
+            <span class="icon-backward2" title="بازگشت"></span>
+        </a>
+    </h1>
+</div>
+<div class="just-padding">
+    <div class="list-group list-group-root">
+        <p class="list-group-item">
+            <i class="fa fa-circle mr-2 ml-1"></i>همه مجوزها
+            <span class="tag tag-pill tag-danger">@Model.Count()</span>
+        </p>
+        @foreach (var item in Model.Where(w => w.ParentId == null))
+        {
+            string itemHref = "item" + item.PermissionId.ToString();
+            if (item.Permissions.Count() != 0)
+            {
+                <a href="#@itemHref" class="list-group-item" data-toggle="collapse">
+                    <i class="fa fa-plus-circle mr-2 ml-1"></i>@item.PermissionId - @item.PermissionTitle
+                    <span class="tag tag-pill tag-danger">@item.Permissions.Count() گروه</span>
+                </a>
+            }
+            else
+            {
+                <p class="list-group-item">
+                    <i class="fa fa-circle mr-2 ml-1"></i>@item.PermissionId - @item.PermissionTitle
+                    <span class="tag tag-pill tag-danger">@item.Permissions.Count() گروه</span>
+                </p>
+            }
+            @if (Model.Any(a => a.ParentId == item.PermissionId))
+            {
+                <div class="list-group collapse " id="@itemHref">
+                    @foreach (var sub in item.Permissions)
+                    {
+                        @if (sub.Permissions.Count() != 0)
+                        {
+                            string subHref = "sub" + sub.PermissionId.ToString();
+                            <a href="#@subHref" class="list-group-item " style="padding-right:10mm !important" data-toggle="collapse">
+                                <i class="fa fa-plus-circle mr-2 ml-1"></i>@sub.PermissionId - @sub.PermissionTitle
+                                <span class="tag tag-pill tag-danger">@sub.Permissions.Count()</span>
+                            </a>
+                            @if (Model.Any(a => a.ParentId == sub.PermissionId))
+                            {
+                                <ul class="list-group collapse" id="@subHref">
+                                    @foreach (var sub2 in sub.Permissions)
+                                    {
+                                        <li class="list-group-item " style="padding-right:20mm !important">@sub2.PermissionId - @sub2.PermissionTitle</li>
+                                    }
+                                </ul>
+                            }
+                        }
+                        else
+                        {
+                            <p class="list-group-item " style="padding-right:10mm !important" data-toggle="collapse">
+                                <i class="fa fa-circle mr-2 ml-1"></i>@sub.PermissionId - @sub.PermissionTitle
+                                <span class="tag tag-pill tag-danger">@sub.Permissions.Count()</span>
+                            </p>
+                        }
+
+
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.list-group-item').click(function () {
+                $('.fa', this)
+                    .toggleClass('fa-plus-circle')
+                    .toggleClass('fa-minus-circle');
+            });
+        })
+    </script>
+}

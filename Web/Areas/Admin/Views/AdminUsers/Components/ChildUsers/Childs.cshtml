@@ -1,0 +1,373 @@
+﻿@model int
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@using DataLayer.Entities.User;
+
+<style>
+
+
+    #accordion .card-title {
+        padding-right: 3mm;
+    }
+
+    .zcardTitle {
+        padding-top: 3mm;
+        padding-bottom: 3mm;
+        padding-right: 6.5mm;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+        .zcardTitle .nochild {
+            margin-right: 3mm;
+           
+        }
+    
+    #accordion .card-header:after {
+        font-family: 'FontAwesome';
+        content: "\f056" /*"\f068"*/;
+        float: right;
+    }
+
+    #accordion .card-header.collapsed:after {
+        /* symbol for "collapsed" panels */
+        content: "\f055" /*"\f068"*/;
+    }
+
+
+
+    
+    #loader .card-header {
+        border-right: 1px solid #872895;
+    }
+
+    #loader .card-body {
+        border-right: 1px solid #872895;
+    }
+    /*#loader .collapse {
+        border-right: 1px solid #872895;
+    }*/
+    #loader .collapsed {
+        border-right: 1px solid green;
+    }
+    #loader .card-body .zcardTitle {
+        border-right: 1px solid #872895;
+    }
+
+
+   /* #loader .card:after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        height: 30%;
+        width: 1mm;
+        border-right: 1px solid #872895;
+        z-index: 1000;
+    }*/
+
+    /*#loader .card:after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        bottom: 0;
+        height: 1px;
+        width: 3mm;
+        border-top: 1px solid #872895;
+    }
+    */
+    
+    /*#loader .card:before {
+        content: "";
+        position: absolute;
+        right: 10px;
+        top: 0;
+        height: 1px;
+        width: 3mm;
+        border-top: 1px solid #872895;
+    }*/
+    
+    
+   
+
+        
+
+
+   
+
+    
+   
+    
+</style>
+@{
+    UserRole userRole = await _userService.GetUserRoleByIdAsync(Model);    
+    string code = User.Identity.Name;
+    List<Core.DTOs.Admin.ChildRate> childRates = _userService.GetAllChilds(Model).ToList();    
+}
+
+@{
+    string collapse1 = string.Empty; string collapse2 = string.Empty; string collapse3 = string.Empty;
+    string collapse4 = string.Empty; string collapse5 = string.Empty; string collapse6 = string.Empty;
+    string collapse7 = string.Empty; string collapse8 = string.Empty; string collapse9 = string.Empty;
+    string heading1 = string.Empty; string heading2 = string.Empty; string heading3 = string.Empty;
+    string heading4 = string.Empty; string heading5 = string.Empty; string heading6 = string.Empty;
+    string heading7 = string.Empty; string heading8 = string.Empty; string heading9 = string.Empty;
+    List<UserRole> childeren1 = userRole.Childeren.Where(w => w.User.IsActive && w.IsActive).ToList();    
+}
+
+<h2 class="text-xs-center alert alert-info">نمودار سازمانی @userRole.User.FullName | @userRole.Role.RoleTitle</h2>
+<h4 class="text-xs-center">
+    تعداد کل همکاران : @childRates.Where(w =>w.UserRole.User.IsActive && w.UserRole.IsActive).Select(s => s.UserRole).Count() | تعداد همکاران مستقیم : @userRole.Childeren.Where(w =>w.User.IsActive && w.IsActive).Count()
+</h4>
+<div class="container" id="loader">
+    <div id="accordion" class="accordion">
+        <div class="card  mb-0">
+            @if (childeren1.Count() != 0)
+            {
+                
+                @foreach (var child1 in childeren1.Where(w =>w.User.IsActive && w.IsActive))
+                {
+                    collapse1 = "collapse1" + child1.URId.ToString();
+                    List<UserRole> childeren2 = child1.Childeren.Where(w => w.User.IsActive && w.IsActive).ToList();
+                    @if (childeren2 .Count() != 0)
+                    {
+                        <div class="card-header collapsed m-r-10" data-toggle="collapse" data-placement="top" href="#@collapse1">
+                            <a class="card-title">
+                                @child1.FullPro
+                                <span class="tag tag-info" data-toggle="collapse" data-placement="top" title="همکاران مستقیم">@childeren2.Count()</span>
+                                <span class="tag tag-warning " data-toggle="collapse" data-placement="top" title="کل همکاران">
+                                    @_userService.GetAllChilds(child1.URId).Where(w =>w.UserRole.User.IsActive && w.UserRole.IsActive ).Count()
+                                </span>
+                            </a>
+                            
+                        </div>
+                        <div id="@collapse1" class="card-body  collapse p-r-15 m-r-10" data-parent="#accordion">
+                           
+                            @foreach (var child2 in childeren2)
+                            {
+                                collapse2 = "collapse2" + child2.URId.ToString();
+                                List<UserRole> childeren3 = child2.Childeren.Where(w => w.User.IsActive && w.IsActive).ToList();
+                                @if (childeren3.Count() != 0)
+                                {
+                                    <div class="card-header collapsed" data-toggle="collapse" href="#@collapse2">
+                                        <a class="card-title">
+                                            @child2.FullPro
+                                            <span class="tag tag-info" title="همکاران مستقیم">@childeren3.Count()</span>
+                                            <span class="tag tag-warning " title="کل همکاران">
+                                                @_userService.GetAllChilds(child2.URId).Where(w =>w.UserRole.User.IsActive && w.UserRole.IsActive).Count()
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div id="@collapse2" class="card-body collapse p-r-15" data-parent="#@collapse1">
+
+                                        @foreach (var child3 in childeren3.Where(w => w.IsActive == true))
+                                        {
+                                            collapse3 = "collapse3" + child3.URId.ToString();
+                                            List<UserRole> childeren4 = child3.Childeren.ToList();
+                                            @if (childeren4.Where(w => w.IsActive == true).Count() != 0)
+                                            {
+                                                <div class="card-header collapsed" data-toggle="collapse" href="#@collapse3">
+                                                    <a class="card-title">
+                                                        @child3.FullPro
+                                                        <span class="tag tag-info" title="همکاران مستقیم">@childeren4.Where(w => w.IsActive == true).Count()</span>
+                                                        <span class="tag tag-warning " title="کل همکاران">
+                                                            @_userService.GetAllChilds(child3.URId).Where(w => w.UserRole.IsActive == true).Count()
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                                <div id="@collapse3" class="card-body collapse p-r-15" data-parent="#@collapse2">
+
+                                                    @foreach (var child4 in childeren4.Where(w => w.IsActive==true))
+                                                    {
+                                                        collapse4 = "collapse4" + child4.URId.ToString();
+                                                        List<UserRole> childeren5 = await _userService.GetDirectChildsAsync(child4.URId);
+                                                        @if (childeren5.Where(w => w.IsActive == true).Count() != 0)
+                                                        {
+                                                            <div class="card-header collapsed" data-toggle="collapse" href="#@collapse4">
+                                                                <a class="card-title">
+                                                                    @child4.FullPro
+                                                                    <span class="tag tag-info" title="همکاران مستقیم">@childeren5.Where(w => w.IsActive == true).Count()</span>
+                                                                    <span class="tag tag-warning " title="کل همکاران">
+                                                                        @_userService.GetAllChilds(child4.URId).Where(w => w.UserRole.IsActive == true).Count()
+                                                                    </span>
+                                                                </a>
+                                                            </div>
+                                                            <div id="@collapse4" class="card-body collapse p-r-15" data-parent="#@collapse3">
+
+                                                                @foreach (var child5 in childeren5.Where(w => w.IsActive == true))
+                                                                {
+                                                                    collapse5 = "collapse5" + child5.URId.ToString();
+                                                                    List<UserRole> childeren6 = await _userService.GetDirectChildsAsync(child5.URId);
+                                                                    @if (childeren6.Where(w => w.IsActive == true).Count() != 0)
+                                                                    {
+                                                                        <div class="card-header collapsed" data-toggle="collapse" href="#@collapse5">
+                                                                            <a class="card-title">
+                                                                                @child5.FullPro
+                                                                                <span class="tag tag-info" title="همکاران مستقیم">@childeren6.Where(w => w.IsActive == true).Count()</span>
+                                                                                <span class="tag tag-warning " title="کل همکاران">
+                                                                                    @_userService.GetAllChilds(child5.URId).Where(w => w.UserRole.IsActive == true).Count()
+                                                                                </span>
+                                                                            </a>
+                                                                        </div>
+                                                                        <div id="@collapse5" class="card-body collapse p-r-15" data-parent="#@collapse4">
+
+                                                                            @foreach (var child6 in childeren6.Where(w => w.IsActive == true))
+                                                                            {
+                                                                                collapse6 = "collapse6" + child6.URId.ToString();
+                                                                                List<UserRole> childeren7 = await _userService.GetDirectChildsAsync(child6.URId);
+                                                                                @if (childeren7.Where(w => w.IsActive == true).Count() != 0)
+                                                                                {
+                                                                                    <div class="card-header collapsed" data-toggle="collapse" href="#@collapse6">
+                                                                                        <a class="card-title">
+                                                                                            @child6.FullPro
+                                                                                            <span class="tag tag-info" title="همکاران مستقیم">@childeren7.Where(w => w.IsActive == true).Count()</span>
+                                                                                            <span class="tag tag-warning " title="کل همکاران">
+                                                                                                @_userService.GetAllChilds(child6.URId).Where(w => w.UserRole.IsActive == true).Count()
+                                                                                            </span>
+                                                                                        </a>
+                                                                                    </div>
+                                                                                    <div id="@collapse6" class="card-body collapse p-r-15" data-parent="#@collapse5">
+
+                                                                                        @foreach (var child7 in childeren7.Where(w => w.IsActive == true))
+                                                                                        {
+                                                                                            collapse7 = "collapse7" + child7.URId.ToString();
+                                                                                            List<UserRole> childeren8 = await _userService.GetDirectChildsAsync(child7.URId);
+                                                                                            if (childeren8.Where(w => w.IsActive == true).Count() != 0)
+                                                                                            {
+                                                                                                <div class="card-header collapsed" data-toggle="collapse" href="#@collapse7">
+                                                                                                    <a class="card-title">
+                                                                                                        @child7.FullPro
+                                                                                                        <span class="tag tag-info" title="همکاران مستقیم">@childeren8.Where(w => w.IsActive == true).Count()</span>
+                                                                                                        <span class="tag tag-warning " title="کل همکاران">
+                                                                                                            @_userService.GetAllChilds(child7.URId).Where(w => w.UserRole.IsActive == true).Count()
+                                                                                                        </span>
+                                                                                                    </a>
+                                                                                                </div>
+                                                                                                <div id="@collapse7" class="card-body collapse p-r-15" data-parent="#@collapse6">
+
+                                                                                                    @foreach (var child8 in childeren8.Where(w => w.IsActive == true))
+                                                                                                    {
+                                                                                                        collapse8 = "collapse8" + child8.URId.ToString();
+                                                                                                        List<UserRole> childeren9 = await _userService.GetDirectChildsAsync(child8.URId);
+                                                                                                        @if (childeren9.Where(w => w.IsActive == true).Count() != 0)
+                                                                                                        {
+                                                                                                            <div class="card-header collapsed" data-toggle="collapse" href="#@collapse8">
+                                                                                                                <a class="card-title">
+                                                                                                                    @child8.FullPro
+                                                                                                                    <span class="tag tag-info" title="همکاران مستقیم">@childeren9.Where(w => w.IsActive == true).Count()</span>
+                                                                                                                    <span class="tag tag-warning " title="کل همکاران">
+                                                                                                                        @_userService.GetAllChilds(child8.URId).Where(w => w.UserRole.IsActive == true).Count()
+                                                                                                                    </span>
+                                                                                                                </a>
+                                                                                                            </div>
+                                                                                                            <div id="@collapse8" class="card-body collapse p-r-15" data-parent="#@collapse7">
+
+                                                                                                                @foreach (var child9 in childeren9.Where(w => w.IsActive == true))
+                                                                                                                {
+                                                                                                                    <span class="fa fa-circle p-r-25 p-t-15 "></span><span class="p-r-15 orange">@child9.FullPro</span>
+
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                        }
+                                                                                                        else
+                                                                                                        {
+                                                                                                            <div class="zcardTitle">
+                                                                                                                <span class="fa fa-circle"></span>  <span class="nochild">@child8.FullPro</span> <span class="tag tag-danger">@childeren9.Where(w => w.IsActive == true).Count()</span>
+                                                                                                            </div>
+                                                                                                        }
+
+                                                                                                    }
+
+                                                                                                </div>
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                <div class="zcardTitle">
+                                                                                                    <span class="fa fa-circle"></span>  <span class="nochild">@child7.FullPro</span> <span class="tag tag-danger">@childeren8.Where(w => w.IsActive == true).Count()</span>
+                                                                                                </div>
+                                                                                            }
+
+                                                                                        }
+
+                                                                                    </div>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <div class="zcardTitle">
+                                                                                        <span class="fa fa-circle"></span>  <span class="nochild">@child6.FullPro</span> <span class="tag tag-danger">@childeren7.Where(w => w.IsActive == true).Count()</span>
+                                                                                    </div>
+                                                                                }
+
+                                                                            }
+
+                                                                        </div>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="zcardTitle">
+                                                                            <span class="fa fa-circle"></span>  <span class="nochild">@child5.FullPro</span> <span class="tag tag-danger">@childeren6.Where(w => w.IsActive == true).Count()</span>
+                                                                        </div>
+                                                                    }
+
+                                                                }
+
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="zcardTitle">
+                                                                <span class="fa fa-circle"></span>  <span class="nochild">@child4.FullPro</span> <span class="tag tag-danger">@childeren5.Where(w => w.IsActive == true).Count()</span>
+                                                            </div>
+                                                        }
+
+                                                    }
+
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="zcardTitle">
+                                                    <span class="fa fa-circle"></span>  <span class="nochild">@child3.FullPro</span> <span class="tag tag-danger">@childeren4.Where(w => w.IsActive == true).Count()</span>
+                                                </div>
+                                            }
+
+
+                                        }
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="zcardTitle">
+                                        <span class="fa fa-circle"></span>  <span class="nochild">@child2.FullPro</span> <span class="tag tag-danger">@childeren3.Where(w => w.IsActive == true).Count()</span>
+                                    </div>
+                                }
+                               
+
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="zcardTitle">
+                            <span class="fa fa-circle"></span>  <span class="nochild">@child1.FullPro</span> <span class="tag tag-danger" title="child">@childeren2.Where(w => w.IsActive==true).Count()</span>
+                        </div>
+                    }
+                   
+
+                }
+            }
+            else
+            {
+                <div>کاربری موجود نمی باشد !</div>
+            }
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

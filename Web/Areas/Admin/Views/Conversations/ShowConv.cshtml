@@ -1,0 +1,158 @@
+﻿@model DataLayer.Entities.ComplementaryInfo.Conversation
+@using Core.Services.Interfaces;
+@inject IComplementaryService _compService
+@{
+    ViewData["Title"] = "پیام ها";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    List<DataLayer.Entities.ComplementaryInfo.Conversation> chConversations = null;
+    if (Model.ParentId == null)
+    {
+        chConversations = await _compService.GetConversationsByParentIdAsync((int)Model.Id);
+        if (User.Identity.Name != "290070")
+        {
+            chConversations = chConversations.Where(w => w.SenderCode == User.Identity.Name || w.SenderCode == "290070").ToList();
+        }
+    }
+}
+
+
+
+@(await Component.InvokeAsync("Talk",Model.Id))
+<div id="@Model.Id">
+    @foreach (var item in chConversations)
+    {
+
+        <div id="@item.Id">@(await Component.InvokeAsync("Talk",item.Id))</div>
+
+        List<DataLayer.Entities.ComplementaryInfo.Conversation> ch2Conversations = await _compService.GetConversationsByParentIdAsync(item.Id);
+        foreach (var ch2 in ch2Conversations)
+        {
+            <div id="@ch2.Id">
+                @(await Component.InvokeAsync("Talk",ch2.Id))
+            </div>
+
+        }
+    }
+    <a href="/Admin/Conversations/Create?parentId=@Model.Id" class="btn btn-success float-xs-left m-t-10">ثبت پاسخ</a>
+</div>
+<script src="~/SiteRef/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //btnZ
+        $(".WantToRead").click(function () {
+            var thid = $(this).attr("data-id");
+           
+            $.ajax({
+                url: "/Admin/Conversations/AddReaderToConv",
+                data: { id: thid },
+                success: function (result) {
+                    if (result == true) {
+                        ch = true;
+                        
+                        //$(this).remove();
+                        //$("#div3").remove(".WantToRead");
+                        //$("#div3").append(resBtn);
+                        $("#Noti" + thid).remove();
+                        $("#mess" + thid).removeClass("hidden");
+                        $.ajax({
+                            url: "/Admin/Conversations/GetUnreadConvCount",
+                            async: true,
+                            type: "GET"
+                        }).done(function (data) {
+                            $("#HConvCount").text(data);
+                            $("#HConvCountNoti").text(data);
+                            $.ajax({
+                                url: "/Admin/Conversations/GetConversation",
+                                data: { Id: thid },
+                                async: true,
+                                success: function (result) {
+                                    $("#" + thid).html(result);
+                                },
+                                error: function () {
+                                    alert("error");
+                                }
+
+                            });
+                        });
+                       
+                        
+                    }
+                }
+
+
+            });
+            
+
+        });
+        $(".btnZ").click(function () {
+            var thid = $(this).attr("data-id");
+            $.ajax({
+                url: "/Admin/Conversations/GetConversation",
+                data: { Id: thid },
+                async: true,
+                success: function (result) {
+                    $("#" + thid).html(result);
+                },
+                error: function () {
+                    alert("error");
+                }
+
+            });
+
+
+        });
+        $(".btn-zRemove").click(function () {
+           
+            var pr = "آیا مطمئن به حذف پیام می باشید؟";
+            Swal.fire({
+                title: 'حــذف پیام',
+                text: pr,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'بله هستم',
+                cancelButtonText: "انصراف"
+            }).then((result) => {
+                if (result.value) {
+                    var thid = $(this).attr("data-id");
+                    $.ajax({
+                        url: "/Admin/Conversations/RemoveConv",
+                        data: { id: thid },
+                        async: true,
+                        type: "POST",
+                        success: function (result) {
+                            if (result == true) {
+                                $("#" + thid).remove();
+                                Swal.fire({
+                                    title: 'پایان عملیات',
+                                    text: 'عملیات با موفقیت انجام شد',
+                                    icon: 'success',
+                                    confirmButtonText: 'متشکرم',
+                                    showCloseButton: true
+                                });
+                            }
+                            else {
+                                Swal.fire({
+                                    title: 'پایان عملیات',
+                                    text: 'عملیات با موفقیت انجام نشد',
+                                    icon: 'danger',
+                                    confirmButtonText: 'متاسفم',
+                                    showCloseButton: true
+                                });
+                            }
+
+                        },
+                        error: function () {
+                            alert("error");
+                        }
+
+                    });
+                }
+            });
+           
+           
+
+        })
+    });
+</script>

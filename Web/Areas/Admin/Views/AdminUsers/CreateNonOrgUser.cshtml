@@ -1,0 +1,178 @@
+﻿@model Core.DTOs.Admin.CreateAdminUserVM
+
+@{
+    ViewData["Title"] = "ثبت نام کاربر";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">ثبت نام کاربر | غیر سازمان فروش</h2>
+
+
+<div class="row">
+    <div class="offset-md-4 col-md-4 col-xs-12">
+        <form asp-action="CreateNonOrgUser">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group row">
+                <label asp-for="UserNC" class="control-label"></label><br />
+                <div class="col-md-8 col-xs-12 m-b-10">
+                    <input asp-for="UserNC" name="UserNC" autofocus class="form-control col-xs-12" />
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <button type="button" id="btnSearch" class="btn btn-outline-info col-xs-12">جستجو</button>
+                </div>
+                <span asp-validation-for="UserNC" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserFirstName" class="control-label"></label>
+                <input asp-for="UserFirstName" class="form-control" />
+                <span asp-validation-for="UserFirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserFamily" class="control-label"></label>
+                <input asp-for="UserFamily" class="form-control" />
+                <span asp-validation-for="UserFamily" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="UserBirthDate" class="control-label"></label>
+                <input asp-for="UserBirthDate" class="form-control" />
+                <span asp-validation-for="UserBirthDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="UserCellphone" class="control-label"></label>
+                <input asp-for="UserCellphone" class="form-control" />
+                <span asp-validation-for="UserCellphone" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StateId" class="control-label"></label>
+                <select asp-for="StateId" class="form-control form-control-lg" id="state">
+                    <option value="">استان را انتخاب کنید...</option>
+                    @foreach (var state in Model.States)
+                    {
+                        if (Model.StateId == state.StateId)
+                        {
+                            <option selected value="@state.StateId">@state.StateName</option>
+                        }
+                        else
+                        {
+                            <option value="@state.StateId">@state.StateName</option>
+                        }
+
+                    }
+                </select>
+                <span asp-validation-for="StateId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CountyId" class="control-label"></label>
+                <select asp-for="CountyId" class="form-control form-control-lg" id="county">
+                    <option value="">شهرستان را انتخاب کنید ...</option>
+                    @if (Model.Counties != null)
+                    {
+                        if (Model.Counties.Count() != 0)
+                        {
+                            foreach (var county in Model.Counties)
+                            {
+                                if (Model.CountyId == county.CountyId)
+                                {
+                                    <option selected value="@county.CountyId">@county.CountyName</option>
+                                }
+                                else
+                                {
+                                    <option value="@county.CountyId">@county.CountyName</option>
+                                }
+                            }
+                        }
+                    }
+
+                </select>
+                <span asp-validation-for="CountyId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RoleId" class="control-label"></label>
+                <select asp-for="RoleId" class="form-control">
+                    <option value="">نقش کاربر را انتخاب کنید</option>
+                    <option value="2">اپراتور</option>
+                    <option value="3">کاربر ویژه</option>
+                </select>
+                <span asp-validation-for="RoleId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ثــبت" class="btn btn-primary col-xs-12" />
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+<script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        $("#state").change(function () {
+            var sval = $(this).val();
+            $.ajax({
+                url: "/Account/ListCountiesofState",
+                data: { stateId: sval },
+                type: "GET"
+            }).done(function (result) {
+                $("#county").html(result);
+            });
+
+        });
+        $("#UserNC").keydown(function () {
+            $("#UserFirstName").val("");
+            $("#UserFamily").val("");
+            $("#UserBirthDate").val("");
+            $("#UserCellphone").val("");
+            $("#state").val("");
+            $("#state").change();
+            $("#county").val("");
+            $("#county").change();
+        })
+        $("#btnSearch").click(function () {
+            var sNC = $("#UserNC").val();
+                if (sNC === "") {
+                    alert("کد ملی را وارد کنید !");
+                    return;
+                }
+                $.ajax({
+                    url: "/Admin/AdminUsers/SearchUserWithNC",
+                    data: { NC: sNC },
+                    type: "Post",
+                    success: function (result) {
+                        $("#UserFirstName").val(result.userFirstName);
+                        $("#UserFamily").val(result.userFamily);
+                        $("#UserBirthDate").val(result.userBirthDate);
+                        $("#UserCellphone").val(result.userCellphone);
+                        var cid = result.countyId;
+                        $("#state").val(result.stateId);
+                        $.ajax({
+                            url: "/Account/ListCountiesofState",
+                            data: { stateId: result.stateId },
+                            type: "GET"
+                        }).done(function (result) {
+                            $("#county").html(result);
+                            $("#county").val(cid);
+                            $("#county").change();
+                        });
+
+                    },
+                    error: function () {
+                        $("#UserFirstName").val("");
+                        $("#UserFamily").val("");
+                        $("#UserBirthDate").val("");
+                        $("#UserCellphone").val("");
+                        $("#state").val("");
+                        $("#state").change();
+                        $("#county").val("");
+                        $("#county").change();
+                        alert("کد ملی وارد شده قبلا ثبت نشده است !");
+                    }
+                });
+
+        });
+    });
+</script>
+

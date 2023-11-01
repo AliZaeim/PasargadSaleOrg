@@ -1,0 +1,197 @@
+﻿@model Core.DTOs.General.PCommissionsReport
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IBordroService _bordroService;
+@{
+    ViewData["Title"] = "گزارش کارمزد شخصی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">گزارش کارمزد فروش شخصی @Model.FullName</h2>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <h4 class="alert alert-danger text-xs-center">@Model.Message</h4>
+}
+@if (Model.CommissionBase == null || Model.Commissions == null || Model.Commissions.Count() == 0)
+{
+
+    <div class="row">
+        <div class="offset-md-4 col-md-4 col-xs-12">
+            <form asp-action="PCommissionsPage" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Mounth" class="control-label"></label>
+                    <select asp-for="Mounth" class="form-control">
+                        <option value="">ماه گزارش را انتخاب کنید ...</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m">@m</option>
+                        }
+
+                    </select>
+                    <span asp-validation-for="Mounth" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Year" class="control-label"></label>
+                    <select asp-for="Year" class="form-control">
+                        <option value="">سال گزارش را انتخاب کنید ...</option>
+                        @for (int y = Model.StartYear; y <= Model.CurrentYear; y++)
+                        {
+                            <option value="@y">@y</option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="ارسال" class="btn btn-primary col-xs-12" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/jquery.validate.unobtrusive.min.js"></script>
+}
+else
+{
+    if (Model.Commissions != null)
+    {
+        if (Model.Commissions.Count() != 0)
+        {
+
+            <div class="col-xs-12 m-b-5">
+                <div class="col-md-3 col-xs-12">
+                    
+                </div>
+                <div class="col-md-6 col-xs-12">
+                    <h4 class="text-xs-center text-info">گزارش کارمزد ماه @Model.Mounth سال @Model.Year</h4>
+                </div>
+                <div class="col-md-3 col-xs-12">
+                    <form action="WritePersonalCommissionsExcelFile" method="post">
+                        <input type="hidden" asp-for="Mounth" />
+                        <input type="hidden" asp-for="Year" />                       
+                        <button type="submit" class="float-xs-left btn btn-primary" title="ثبت فایل اکسل"><span class="fa fa-file-excel-o fs-16 yellow"></span></button>
+                    </form>
+                </div>
+                
+                
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped sortable table-numberedRows fs-14">
+                    <thead>
+                        <tr>
+                            
+                            <th class="text-xs-center align-middle p-0">شماره بیمه نامه</th>
+                            <th class="text-xs-center align-middle p-0">بیمه گذار</th>
+                            <th class="text-xs-center align-middle p-0">بیمه شده</th>
+                            <th class="text-xs-center align-middle p-0">تاریخ سررسید</th>
+                            <th class="text-xs-center align-middle p-0">تاریخ واریز</th>
+                            <th class="text-xs-center align-middle p-0">حق بیمه عمر</th>
+                            <th class="text-xs-center align-middle p-0">حق بیمه تکمیلی</th>
+                            <th class="text-xs-center align-middle p-0">مجموع حق بیمه</th>
+                            <th class="text-xs-center align-middle p-0">کارمزد عمر</th>
+                            <th class="text-xs-center align-middle p-0">کارمزد تکمیلی</th>
+                            <th class="text-xs-center align-middle p-0">مجموع کارمزد</th>
+                            <th class="text-xs-center align-middle p-0">درصد</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int radif = 1;
+                        }
+                        @{ double PLifeComSum = 0; double PSupComSum = 0; double PTotalComSum = 0;}
+                        @foreach (var item in Model.Commissions)
+                        {
+
+
+                            DataLayer.Entities.LifeBordro.LifeBordroBase lifeBordroBase = await _bordroService.GetLifeBordroBaseById(item.LifeBordroBase.Id);
+                            DataLayer.Entities.LifeBordro.LifeBordroAddition ActiveAddition = lifeBordroBase.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true);
+                            <tr>
+                                
+                                <td class="text-xs-center align-middle p-0">@item.LifeBordroBase.InsNO</td>
+                                <td class="text-xs-center align-middle p-0">@ActiveAddition.InsurerFullName</td>
+                                <td class="text-xs-center align-middle p-0">@ActiveAddition.InsuredFullName</td>
+                                <td class="text-xs-center align-middle p-0">@item.DueDate.ToShamsi()</td>
+                                <td class="text-xs-center align-middle p-0">@item.PaidDate.ToShamsi()</td>
+                                <td class="text-xs-center align-middle p-0">@item.LifePremium.ToString("N0")</td>
+                                <td class="text-xs-center align-middle p-0">@item.SupPermium.ToString("N0")</td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        long PremiumSum = item.LifePremium + item.SupPermium;
+                                    }
+                                    @PremiumSum.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+
+                                        float NewPer = 0;
+                                        float per = 0;
+                                        long LifeCom = 0;
+                                        int loop = 1;
+                                        foreach (var up in ActiveAddition.SalesUsers.LastOrDefault().Split("-").ToList())
+                                        {
+                                            if (loop == 3)
+                                            {
+                                                per = float.Parse(up.ToString());
+                                            }
+                                            loop++;
+                                        }
+                                        NewPer = (per / item.Percent);
+                                        //NewPer = (float)Math.Round(NewPer, 2, MidpointRounding.ToNegativeInfinity);
+                                        LifeCom = (long)(NewPer * (item.LifeCommission*100/item.Percent));
+                                        PLifeComSum += LifeCom;
+                                    }
+
+                                    @LifeCom.ToString("N0")
+                                </td>
+
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        long SupCom = 0;
+                                        SupCom = (long)(NewPer * (item.SupCommission*100/item.Percent));
+                                        PSupComSum += SupCom;
+                                    }
+                                    @SupCom.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @{
+                                        long CommissionSum = LifeCom + SupCom;
+                                        PTotalComSum += CommissionSum;
+                                    }
+                                    @CommissionSum.ToString("N0")
+
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @per
+                                </td>
+
+                            </tr>
+                            radif++;
+                        }
+                        <tr>
+                            <td colspan="4"></td>
+                            <td class="text-xs-center text-bold-900 p-0">جمع کل </td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@Model.Commissions.Sum(s => s.LifePremium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@Model.Commissions.Sum(s => s.SupPermium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@Model.Commissions.Sum(s => s.LifePremium + s.SupPermium).ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@PLifeComSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@PSupComSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">@PTotalComSum.ToString("N0")</td>
+                            <td class="text-xs-center align-middle text-bold-900 p-0">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    }
+
+
+}
+
+
+
+

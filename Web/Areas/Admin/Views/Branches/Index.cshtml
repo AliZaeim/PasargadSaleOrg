@@ -1,0 +1,68 @@
+﻿@model IEnumerable<DataLayer.Entities.ComplementaryInfo.Branch>
+
+@{
+    ViewData["Title"] = " اطلاعات شعب بیمه پاسارگاد";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">اطلاعات شعب بیمه پاسارگاد</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">شعبه جدید</a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-numberedRows table-striped">
+        <thead>
+            <tr>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.BrName)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.BrCode)
+                </th> 
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.ManagerName)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.Phone)
+                </th>
+                <th class="text-xs-center align-middle p-0">
+                    @Html.DisplayNameFor(model => model.Fax)
+                </th>
+                <th class="text-xs-center align-middle p-0">عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-xs-center align-middle p-0">
+                        @Html.DisplayFor(modelItem => item.BrName)
+                    </td>
+                    <td class="text-xs-center align-middle p-0">
+                        @Html.DisplayFor(modelItem => item.BrCode)
+                    </td>
+                   
+                    <td class="text-xs-center align-middle p-0">
+                        @Html.DisplayFor(modelItem => item.ManagerName)
+                    </td>
+                    
+                    <td class="text-xs-center align-middle p-0">
+                        @Html.DisplayFor(modelItem => item.Phone)
+                    </td>
+                    <td class="text-xs-center align-middle p-0">
+                        @Html.DisplayFor(modelItem => item.Fax)
+                    </td>
+                    
+                    <td class="text-xs-center align-middle p-0">
+                        <a asp-action="Edit" asp-route-id="@item.Id">ویرایش</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">جزئیات</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">حــذف</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

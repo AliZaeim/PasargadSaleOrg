@@ -1,0 +1,120 @@
+﻿@model (string, Core.DTOs.General.InsuredInfoReportModel)
+@using Core.Services.Interfaces;
+@inject IBordroService _bordroService
+@{
+    ViewData["Title"] = "جزئیات اطلاعات بیمه شده";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+@if (Model.Item2 == null)
+{
+    <h3 class="text-xs-center alert alert-warning">
+        @Model.Item1
+       
+    </h3>
+
+}
+else
+{
+    <h2 class="text-xs-center alert alert-info">جزئیات اطلاعات بیمه شده  @Model.Item2.InsuredFullName</h2>
+    <div class="col-xs-12 border pt-1 pb-1 rounded">
+        <div class="form-group line-height-2 col-xs-12">
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">کد ملی</span> : @Model.Item2.InsuredNC
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">تاریخ تولد</span> : @Model.Item2.InsuredBirthDate
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">تلفن همراه</span> : @Model.Item2.Cellphone
+            </div>
+        </div>
+
+        <div class="form-group line-height-2 border-bottom pb-1 col-xs-12">
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">تلفن</span> : @Model.Item2.Phone
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">استان</span> : @Model.Item2.State
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">شهر</span> : @Model.Item2.City
+            </div>
+            <div class="col-xs-12">
+                <span class="font-weight-bold">آدرس</span> : @Model.Item2.Address
+            </div>
+
+        </div>
+
+        <div class="form-group line-height-2 col-xs-12">
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">بیمه نامه</span> : @Model.Item2.InsNO
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">بیمه گذار</span> : @Model.Item2.InsurerFullName
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">کد ملی</span> : @Model.Item2.InsurerNC
+            </div>
+        </div>
+        <div class="form-group line-height-2 col-xs-12">
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">تاریخ صدور</span> : @Model.Item2.IssueDate
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">وضعیت</span> : @Model.Item2.Status
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">نوع الحاقیه</span> : @Model.Item2.AdditionType
+            </div>
+        </div>
+        <div class="form-group line-height-2 border-bottom pb-1 col-xs-12">
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">مدت</span> : @Model.Item2.Duration
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">روش پرداخت</span> : @Model.Item2.PaymentMethod
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">حق بیمه</span> : @Model.Item2.PaymentMethodValue.ToString("N0") ریال
+            </div>
+
+        </div>
+
+        <div class="form-group line-height-2 col-xs-12">
+            <div class="col-md-4 col-xs-12">
+                <span class="font-weight-bold">نماینده</span> : @Model.Item2.Seller
+            </div>
+            <div class="col-md-8 col-xs-12">
+                @{
+                    List<DataLayer.Entities.LifeBordro.SalesObject> salesObjects = await _bordroService.GetSalesObjectsofBordroAsync(Model.Item2.LifeBordroBase.Id);
+                }
+                <span class="font-weight-bold">سازمان</span> :
+                @{
+                    int loop = 1;
+                    salesObjects = salesObjects.Where(w => w.UserRole.User.Code != "290070").ToList();
+                }
+                @foreach (var org in salesObjects.OrderBy(r => r.SRate))
+                {
+                    @if (loop % 2 != 0)
+                    {
+                        <span class="bg bg-success white fs-12 rounded">@loop - @org.UserRole.FullPro</span>
+                    }
+                    else
+                    {
+                        <span class="bg bg-info white fs-12 rounded">@loop - @org.UserRole.FullPro</span>
+                    }
+
+                    loop++;
+
+
+                }
+
+            </div>
+        </div>
+    </div>
+    <div>
+        <a class="float-md-left" href="/Admin/BordroReports/Insureds">بازگشت</a>
+    </div>
+}
+
+

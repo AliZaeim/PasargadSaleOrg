@@ -1,0 +1,303 @@
+﻿@model Core.DTOs.Admin.ReportLifeInsurancesVM
+@using Core.Convertors;
+@using Core.Services.Interfaces;
+@inject IUserService _userService
+@inject IBordroService _bordroService
+@{
+    ViewData["Title"] = "بیمه نامه های شخصی";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    DataLayer.Entities.User.User user = await _userService.GetUserByUserName(User.Identity.Name);
+
+}
+
+<div>
+    <div class="col-md-1 col-xs-12"></div>
+    <div class="col-md-10 col-xs-12">
+        @if (User != null)
+        {
+            @if (User.Identity.Name != "290070")
+            {
+                <h2 class="text-xs-center alert alert-info">بیمه نامه های شخصی  @user.FullName</h2>
+            }
+            else
+            {
+                <h2 class="text-xs-center alert alert-info">تمام بیمه نامه ها</h2>
+            }
+        }
+        else
+        {
+            <h2 class="text-xs-center alert alert-info">بیمه نامه های شخصی </h2>
+
+        }
+    </div>
+    <div class="col-md-1 col-xs-12">
+        @if (User.Identity.Name == "290070")
+        {
+            //WriteOrgBordroExcelFile
+            <form action="WriteOrgBordroExcelFile" method="post">
+                <button type="submit" title="ثبت گزارش اکسل" class="btn btn-outline-primary float-xs-left mb-1"><span class="fa fa-file-excel-o orange"></span></button>
+            </form>
+
+        }
+        else
+        {
+            <form action="WritePersonalBordroExcelFile" method="post">
+                <button type="submit" title="ثبت گزارش اکسل" class="btn btn-outline-primary float-xs-left mb-1"><span class="fa fa-file-excel-o orange"></span></button>
+            </form>
+        }
+
+    </div>
+    <div class="form-group  col-xs-12 pr-0 pl-0">
+
+        <form action="LifeInsurances" method="post" class="form-inline">
+
+            <div class="col-md-5 col-xs-12 mb-1">
+                <div class="col-xs-4 p-0 pl-1">
+                    <select asp-for="IsDateRange" name="IsDateRange" title="نوع جستجو" class="col-xs-12  input-lg fs-14">
+                        <option disabled value="">روش جستجو</option>
+                        <option value="0">عــادی</option>
+                        <option value="1">محدوده تاریخ</option>
+                    </select>
+                </div>
+
+                @{
+                    string ztitle = "جستجوی موارد زیر : \n بیمه گذار \n بیمه شده \n نماینده \n روش پرداخت \n محدوده تاریخ صدور \n به صورت : \n 1399/01-1399/05 \n 1399/01/01-1399/05/20";
+                }
+                <input class="col-xs-7 input-lg text-xs-center" asp-for="SearchText" name="search" type="text" autofocus autocomplete="off" id="searchInput" value="@Model?.SearchText" placeholder="جستجو...">
+                <span class=" col-xs-1 fa fa-info-circle orange" title="@ztitle"></span>
+                <span asp-validation-for="SearchText" class="text-danger col-xs-12"></span>
+            </div>
+            <div class="col-md-5 col-xs-12 mb-1 form-group">
+                <input type="number" name="RecCount" class="col-md-5 col-xs-6 text-xs-center" placeholder="تعداد" data-toggle="tooltip" data-placement="top" title="تعداد در صفحه" value="@Model?.RecCount" />
+                <input type="number" maxlength="5" name="page" class="offset-md-2 col-md-5 col-xs-6  text-xs-center" placeholder="برو به ؟" data-toggle="tooltip" data-placement="top" title="انتقال به صفحه" />
+            </div>
+            <div class="col-md-2 col-xs-12 form-group">
+                <input type="submit" value="تایید" class="col-xs-12" />
+            </div>
+        </form>
+    </div>
+    <div class="form-group col-xs-12 pt-1 mb-2 border-grey">
+        <div class="col-md-2 col-xs-6 mb-1">کل داده ها : <span class="tag tag-info ">@Model?.TotalRecCount</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">کل صفحات : <span class="tag tag-success">@Model?.TotalPages</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">صفحه فعلی : <span class="tag tag-info">@Model.CurPage</span></div>
+        <div class="col-md-2 col-xs-6 mb-1">تعداد در صفحه : <span class="tag tag-success">@Model.RecCount</span></div>
+        <div class="col-md-4 col-xs-12">جستجو براساس : <span class="tag tag-warning ">@Model.SearchText</span></div>
+
+    </div>
+</div>
+
+
+
+<div class="table-responsive">
+   
+    @if (Model.PageBordroes != null)
+    {
+        <table class="table table-bordered table-striped sortable table-numberedRows fs-13" id="tblBordroes">
+            <thead>
+                <tr class="fs-12">
+
+                    <th class="text-xs-center align-middle width-15-per p-0">
+                        شماره بیمه نامه
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        تاریخ صدور
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        بیمه گذار
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        بیمه شده
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        نماینده
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        روش
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        حق بیمه
+                    </th>
+                    <th class="text-xs-center align-middle p-0">
+                        وضعیت
+                    </th>
+                    <th class="text-xs-center align-middle p-0 width-20-per">
+                        سازمان
+                        <span class="fa fa-eye float-xs-left red ml-1 cursor-pointer" id="showall"></span>
+                    </th>
+                    <th class="text-xs-center align-middle p-0">جزئیات</th>
+                </tr>
+            </thead>
+            @if (Model.PageBordroes != null)
+            {
+                <tbody id="myTable" class="fs-13">
+                    @if (Model.PageBordroes != null)
+                    {
+
+
+                        @foreach (var item in Model.PageBordroes)
+                        {
+                            int LastAddNo = item.LifeBordroAdditions.OrderByDescending(f => f.Number).FirstOrDefault().Number;
+                            string zclass = string.Empty;
+                            if (LastAddNo != 0)
+                            {
+                                zclass = "font-weight-bold";
+                            }
+                            <tr class="@zclass">
+
+                                <td class="text-xs-center align-middle p-0">
+                                    @if (LastAddNo != 0)
+                                    {
+                                        string insn = item.InsNO + "_" + LastAddNo;
+                                        <span dir="ltr">@insn</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.InsNO</span>
+                                    }
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @item.IssueDate.ToShamsi()
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @item.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true).InsurerFullName
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @item.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true).InsuredFullName
+                                </td>
+                                <td class="text-xs-center align-middle p-0 ">
+                                    @item.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true).Seller
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @item.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true).PaymentMethod
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @item.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true).PremiumbyPaymentMethod.ToString("N0")
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    @item.LifeBordroAdditions.FirstOrDefault(f => f.IsActive == true).Status
+                                </td>
+
+                                <td class="text-xs-center align-middle p-0">
+                                    <span class="fa fa-eye sorg cursor-pointer" title="سازمان"></span><br />
+                                    <span class="divsorg hidden">
+                                        @{
+                                            List<DataLayer.Entities.LifeBordro.SalesObject> salesObjects = await _bordroService.GetSalesObjectsofBordroAsync(item.Id);
+                                            foreach (var org in salesObjects.OrderByDescending(r => r.SRate).Skip(1))
+                                            {
+                                                <span class="col-xs-12 fs-10 p-0">
+                                                    @org.UserRole.FullPro
+                                                </span>
+                                            }
+
+
+
+                                        }
+
+                                    </span>
+                                </td>
+                                <td class="text-xs-center align-middle p-0">
+                                    <a href="/Admin/BordroReports/LifeInsuranceDetails?id=@item.Id&retUrl=/Admin/BordroReports/OrgLifeInsurances">جزئیات</a>
+                                </td>
+                            </tr>
+
+                        }
+                    }
+
+                </tbody>
+            }
+
+            <tfoot>
+                @{
+                    long pageSum = Model.PageBordroes.SelectMany(s => s.LifeBordroAdditions).Where(w => w.IsActive).Sum(x =>(long) x.PremiumbyPaymentMethod);
+                    long TSum = Model.AllBordroes.SelectMany(s => s.LifeBordroAdditions).Where(w => w.IsActive).Sum(x =>(long) x.PremiumbyPaymentMethod);
+                }
+                <tr class="bg-grey white">
+                    <td class="text-md-left align-middle p-0 pl-1" colspan="7">جمع : </td>
+                    <td class="text-xs-center align-middle p-0 " colspan="2">@pageSum.ToString("N0")</td>
+
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="bg-success white">
+                    <td class="text-md-left align-middle p-0 pl-1" colspan="7">جمع کل : </td>
+                    <td class="text-xs-center align-middle p-0 " colspan="2">@TSum.ToString("N0")</td>
+
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        
+    }
+    else
+    {
+        <h4 class="text-xs-center alert alert-danger">بیمه نامه ای وجود ندارد !</h4>
+    }
+
+    <input type="hidden" id="stext" value="@Model.SearchText" />
+</div>
+
+@section Scripts{
+
+
+    <script src="~/LayoutRef/js/jquery.mark.min.js"></script>
+    <script src="~/AdminRef/app-assets/js/sorttable.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+
+            $("tbody td").on("mouseover", function () {
+                var row_index = $(this).parent().index();
+                var col_index = $(this).index();
+                $(this).prop("title", row_index + 1);
+            });
+            var srch = $("#stext").val();
+            if (srch !== "") {
+                if (srch.includes("-") === false) {
+                    var term = srch;
+
+                    var $context = $("table tbody tr");
+                    $context.show().unmark();
+                    if (term) {
+                        $context.mark(term, {
+                            "className": "bg-warning",
+                            "separateWordSearch": true,
+                            "accuracy": "complementary",
+                            done: function () {
+                                $context.not(":has(mark)").hide();
+                            }
+                        });
+                    }
+                }
+
+            }
+            $(".sorg").click(function () {
+
+                $(this).attr('title', $(this).attr('title') === 'سازمان' ? 'مخفی' : 'سازمان');
+                var $thuli = $(this).siblings(".divsorg");
+
+                if ($(this).hasClass("fa-eye-slash")) {
+                    $thuli.toggleClass('hidden shown');
+                }
+                if ($(this).hasClass("fa-eye")) {
+                    $thuli.toggleClass('hidden shown');
+                }
+                $(this).toggleClass("fa-eye fa-eye-slash");
+            });
+            $("#showall").click(function () {
+                if ($(this).hasClass("fa-eye")) {
+                    $(".divsorg:hidden").toggleClass("hidden shown");
+                    $(".sorg.fa-eye").toggleClass("fa-eye fa-eye-slash");
+                }
+                if ($(this).hasClass("fa-eye-slash")) {
+                    $(".divsorg:not(:hidden)").toggleClass('hidden shown');
+                    $(".sorg.fa-eye-slash").toggleClass("fa-eye fa-eye-slash");
+                }
+                $(this).toggleClass("fa-eye fa-eye-slash");
+
+            })
+        });
+    </script>
+}

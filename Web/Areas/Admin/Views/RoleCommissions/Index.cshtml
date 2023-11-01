@@ -1,0 +1,135 @@
+﻿@model IEnumerable<DataLayer.Entities.User.RoleCommission>
+@using Core.Services.Interfaces;
+@using DataLayer.Entities.ComplementaryInfo;
+@using Core.Convertors;
+@inject IUserService userService
+@{
+    ViewData["Title"] = "لیست کارمزدها";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-xs-center alert alert-info">کارمزد سطوح</h2>
+@if (userService.CheckPermissionByNameAsync(65, User.Identity.Name))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success">کارمزد جدید</a>
+    </p>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.PersonalSalesPercent)
+                </th>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.OrganizationSalesPercent)
+                </th>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.MinSaleValue)
+                </th>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.MinSaleCount)
+                </th>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.Role.RoleTitle)
+                </th>
+                <th class="text-xs-center align-middle">
+                    @Html.DisplayNameFor(model => model.Rate)
+                </th>
+                <th class="text-xs-center align-middle">
+                    سابقه تغییرات
+                </th>
+
+                <th class="text-xs-center align-middle">عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderBy(r => r.RoleId))
+            {
+                <tr>
+                    <td class="text-xs-center align-middle">
+                        @Html.DisplayFor(modelItem => item.PersonalSalesPercent)
+                    </td>
+                    <td class="text-xs-center align-middle">
+                        @Html.DisplayFor(modelItem => item.OrganizationSalesPercent)
+                    </td>
+                    <td class="text-xs-center align-middle">
+                        @item.MinSaleValue.ToString("N0")
+                    </td>
+                    <td class="text-xs-center align-middle">
+                        @Html.DisplayFor(modelItem => item.MinSaleCount)
+                    </td>
+
+                    <td class="text-xs-center align-middle">
+                        @Html.DisplayFor(modelItem => item.Role.RoleTitle)
+                    </td>
+                    <td class="text-xs-center align-middle">
+                        @Html.DisplayFor(modelItem => item.Rate)
+                    </td>
+                    <td class="text-xs-right align-middle p-1">
+                        @{
+                            List<ChangeLog> rec = await userService.GetRecordUpdateLogs(item.Id, "RoleCommission");
+                        }
+
+                        @if (rec != null)
+                        {
+
+                            @if (rec.Count() != 0)
+                            {
+                                <span class="fa fa-eye-slash cursor-pointer zeye w-100 text-xs-center" title="مشاهده"></span>
+                                int rd = 1;
+                                foreach (var r in rec.OrderByDescending(r => r.DateChanged))
+                                {
+                                    <div class="updlist hidden">
+                                        @foreach (var t in r.DescriptionList)
+                                        {
+                                            if (!string.IsNullOrEmpty(t))
+                                            {
+                                                <p>@rd - @t</p>
+                                                rd++;
+                                            }
+
+                                        }
+                                        <p class="text-info text-xs-center">@r.DateChanged.ToShamsiWithTime()</p>
+                                        <hr />
+                                    </div>
+
+
+                                }
+                            }
+                            else
+                            {
+                                <span class="col-xs-12 text-xs-center">-</span>
+                            }
+
+                        }
+                        else
+                        {
+                            <span class="col-xs-12 text-xs-center">-</span>
+                        }
+                    </td>
+                    <td class="text-xs-center align-middle ">
+                        @if (userService.CheckPermissionByNameAsync(66, User.Identity.Name))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id">ویرایش</a> <span>|</span>
+                        }
+                        @if (userService.CheckPermissionByNameAsync(67, User.Identity.Name))
+                        {
+                            <a asp-action="Details" asp-route-id="@item.Id">جزئیات</a> <span>|</span>
+                        }
+                        @if (userService.CheckPermissionByNameAsync(68, User.Identity.Name))
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.Id">حذف</a>
+                        }
+
+
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script src="~/AdminRef/app-assets/js/jquery-1.12.4.min.js"></script>
